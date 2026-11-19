@@ -1,0 +1,54 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { ArrowUp, ArrowDown } from 'lucide-react';
+
+export default function ScrollToTop() {
+  const [scrollY, setScrollY] = useState(0);
+  const [isBottom, setIsBottom] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+      setIsBottom(
+        window.scrollY + window.innerHeight >= document.body.scrollHeight - 100,
+      );
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const isTop = scrollY <= 300;
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToBottom = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="fixed bottom-8 right-8 flex flex-col gap-2 z-50">
+      {!isTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="맨 위로 이동"
+          className="w-12 h-12 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-btn-focus hover:text-btn-focus-text transition-all"
+        >
+          <ArrowUp size={20} aria-hidden="true" />
+        </button>
+      )}
+      {!isBottom && (
+        <button
+          type="button"
+          onClick={scrollToBottom}
+          aria-label="맨 아래로 이동"
+          className="w-12 h-12 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-btn-focus hover:text-btn-focus-text transition-all"
+        >
+          <ArrowDown size={20} aria-hidden="true" />
+        </button>
+      )}
+    </div>
+  );
+}

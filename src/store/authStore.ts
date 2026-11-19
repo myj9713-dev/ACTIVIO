@@ -1,0 +1,25 @@
+import { create } from 'zustand';
+
+interface User {
+  id: string;
+  email: string;
+  nickname: string;
+  role: string;
+}
+
+interface AuthStore {
+  user: User | null;
+  isLoggedIn: boolean;
+  // eslint-disable-next-line no-unused-vars
+  setUser: (user: User) => void;
+  logout: () => void;
+}
+
+const useAuthStore = create<AuthStore>((set) => ({
+  user: null,
+  isLoggedIn: false,
+  setUser: (user) => set({ user, isLoggedIn: true }),
+  logout: () => set({ user: null, isLoggedIn: false }),
+}));
+
+export default useAuthStore;

@@ -1,0 +1,144 @@
+import Image from 'next/image';
+import { getStatus, getDday } from '@/utils/formatDate';
+import { timeAgo } from '@/utils/timeAgo';
+
+export interface CompetitionDetailCardData {
+  name: string;
+  image_url?: string | null;
+  description?: string | null;
+  event_data: string;
+  location: string;
+  apply_deadline: string;
+  participants?: number;
+  created_at?: string;
+  commentCount?: number;
+  nickname?: string | null;
+  avatar_url?: string | null;
+}
+
+interface CompetitionDetailCardProps {
+  data: CompetitionDetailCardData;
+  headerActions?: React.ReactNode;
+}
+
+export default function CompetitionDetailCard({
+  data,
+  headerActions,
+}: CompetitionDetailCardProps) {
+  const status = getStatus(data.apply_deadline);
+  const dday = getDday(data.apply_deadline);
+
+  const ddayColor =
+    dday === 'D-DAY'
+      ? 'text-danger'
+      : dday.startsWith('D-')
+        ? 'text-blue-400'
+        : 'text-text-secondary';
+
+  return (
+    <article
+      className="bg-bg-surface rounded-2xl border border-white/[0.06] overflow-hidden"
+      aria-label={`${data.name} 대회 상세`}
+    >
+      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-white/[0.08] overflow-hidden shrink-0">
+            <Image
+              src={
+                data.avatar_url?.startsWith('http')
+                  ? data.avatar_url
+                  : '/basic.svg'
+              }
+              alt={
+                data.nickname
+                  ? `${data.nickname} 프로필 이미지`
+                  : '기본 프로필 이미지'
+              }
+              width={40}
+              height={40}
+              className="w-full h-full object-cover rounded-full"
+            />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span
+                className="text-sm font-semibold text-text-primary"
+                aria-label={`작성자: ${data.nickname ?? '알 수 없음'}`}
+              >
+                {data.nickname ?? '알 수 없음'}
+              </span>
+            </div>
+            <time dateTime={data.created_at} className="text-xs text-text-secondary">
+              {data.created_at ? timeAgo(data.created_at) : '방금 전'}
+            </time>
+          </div>
+        </div>
+        {headerActions && (
+          <div
+            className="flex items-center gap-1"
+            role="toolbar"
+            aria-label="게시글 액션"
+          >
+            {headerActions}
+          </div>
+        )}
+      </div>
+      <div className="px-5 pb-3">
+        <h1 className="text-base font-bold text-text-primary">
+          {data.name || '대회 제목'}
+        </h1>
+      </div>
+
+      {data.image_url && (
+        <div className="relative w-full aspect-video bg-white/[0.05]">
+          <Image
+            src={data.image_url}
+            alt={`${data.name} 대회 이미지`}
+            fill
+            className="object-cover"
+          />
+        </div>
+      )}
+
+      <dl
+        className="grid grid-cols-3 divide-x divide-white/[0.06] border-y border-white/[0.06] text-center py-3 px-2"
+        aria-label="대회 정보"
+      >
+        <div className="px-2">
+          <dt className="text-xs text-text-secondary mb-1">일시</dt>
+          <dd className="text-xs font-medium text-text-primary">
+            {data.event_data || '-'}
+          </dd>
+        </div>
+        <div className="px-2">
+          <dt className="text-xs text-text-secondary mb-1">장소</dt>
+          <dd className="text-xs font-medium text-text-primary">
+            {data.location || '-'}
+          </dd>
+        </div>
+        <div className="px-2">
+          <dt className="text-xs text-text-secondary mb-1">신청마감</dt>
+          <dd className="text-xs font-medium text-text-primary">
+            {data.apply_deadline || '-'}
+          </dd>
+          {status !== '모집완료' && data.apply_deadline && (
+            <p
+              className={`text-xs font-bold ${ddayColor}`}
+              aria-label={`마감까지 ${dday}`}
+            >
+              {dday}
+            </p>
+          )}
+        </div>
+      </dl>
+
+      <div className="px-5 py-4">
+        <p className="text-sm text-text-primary leading-relaxed whitespace-pre-line">
+          {data.description || '대회 설명이 여기에 표시됩니다.'}
+        </p>
+      </div>
+
+      <div className="border-t border-white/[0.06] mx-5 mb-3" aria-hidden="true" />
+    </article>
+  );
+}

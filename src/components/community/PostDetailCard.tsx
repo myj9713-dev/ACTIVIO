@@ -1,0 +1,129 @@
+import { timeAgo } from '@/utils/timeAgo';
+import Image from 'next/image';
+import { categoryMap } from '@/constants/categoryMap';
+
+export interface PostDetailCardData {
+  nickname: string;
+  avatar_url?: string | null;
+  category?: string | null;
+  created_at: string;
+  title: string;
+  image_url?: string | null;
+  video_url?: string | null;
+  content: string;
+  commentCount: number;
+}
+
+interface PostDetailCardProps {
+  post: PostDetailCardData;
+  headerActions?: React.ReactNode;
+  likeAction?: React.ReactNode;
+}
+
+export default function PostDetailCard({
+  post,
+  headerActions,
+  likeAction,
+}: PostDetailCardProps) {
+  const badge = categoryMap[post.category ?? ''] ?? categoryMap.personal;
+
+  return (
+    <div className="bg-bg-surface rounded-2xl border border-white/[0.06] overflow-hidden">
+      <div className="flex items-center justify-between px-5 pt-5 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-white/[0.08] overflow-hidden shrink-0">
+            <Image
+              src={post.avatar_url || '/basic.svg'}
+              alt={`${post.nickname} 프로필 이미지`}
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold text-text-primary">
+                {post.nickname}
+              </span>
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full font-medium ${badge.badgeClass}`}
+              >
+                {badge.label}
+              </span>
+            </div>
+            <p
+              className="text-xs text-text-secondary mt-0.5 flex items-center gap-1"
+              suppressHydrationWarning
+            >
+              <Image
+                src="/postTime.svg"
+                alt=""
+                aria-hidden="true"
+                width={11}
+                height={11}
+                className="opacity-50"
+              />
+              {timeAgo(post.created_at)}
+            </p>
+          </div>
+        </div>
+        {headerActions && (
+          <div className="flex items-center gap-1 [&_button]:cursor-pointer">
+            {headerActions}
+          </div>
+        )}
+      </div>
+
+      <div className="px-5 pb-3">
+        <h1 className="text-lg font-bold text-text-primary">{post.title}</h1>
+      </div>
+
+      {post.image_url && (
+        <div className="px-5 pb-4">
+          <div className="rounded-xl overflow-hidden">
+            <Image
+              src={post.image_url}
+              alt={`${post.title} 게시글 이미지`}
+              width={800}
+              height={400}
+              className="w-full object-cover max-h-72"
+            />
+          </div>
+        </div>
+      )}
+
+      {post.video_url && (
+        <div className="px-5 pb-4">
+          <div className="rounded-xl overflow-hidden bg-black">
+            <video
+              src={post.video_url}
+              controls
+              className="w-full max-h-96"
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="px-5 pb-5">
+        <p className="text-sm text-text-primary whitespace-pre-line leading-relaxed">
+          {post.content}
+        </p>
+      </div>
+
+      <div className="px-5 py-3 border-t border-white/[0.06] flex items-center gap-4">
+        {likeAction}
+
+        <div className="flex items-center gap-1.5 text-xs text-text-secondary">
+          <Image
+            src="/postComment.svg"
+            alt=""
+            aria-hidden="true"
+            width={16}
+            height={16}
+          />
+          <span>댓글 {post.commentCount}</span>
+        </div>
+      </div>
+    </div>
+  );
+}

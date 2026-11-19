@@ -1,0 +1,198 @@
+'use client';
+
+import AdminBadge from '@/components/admin/AdminBadge';
+import AdminDataTable, {
+  type AdminTableColumn,
+} from '@/components/admin/AdminDataTable';
+import AdminTableToolbar from '@/components/admin/AdminTableToolbar';
+import AdminSupportDojangActions from '@/components/admin/support/AdminSupportDojangActions';
+import AdminSupportReportActions from '@/components/admin/support/AdminSupportReportActions';
+import {
+  DOJANG_STATUS_BADGE_VARIANT_MAP,
+  REPORT_ACTION_BADGE_VARIANT_MAP,
+  REPORT_POST_STATUS_BADGE_VARIANT_MAP,
+  REPORT_STATUS_BADGE_VARIANT_MAP,
+  SUPPORT_SECTION_FILTERS,
+} from '@/components/admin/support/constants';
+import type {
+  AdminDojangVerificationRow,
+  AdminReportRow,
+  SupportSection,
+} from '@/components/admin/support/types';
+import { useAdminTableQueryState } from '@/hooks/useAdminTableQueryState';
+import { ADMIN_TABLE_PAGE_SIZE } from '@/lib/adminTableServerPagination';
+
+interface AdminSupportTableClientProps {
+  dojangVerifications: AdminDojangVerificationRow[];
+  reports: AdminReportRow[];
+  totalCount: number;
+  pageSize?: number;
+}
+
+const DOJANG_COLUMNS: AdminTableColumn<AdminDojangVerificationRow>[] = [
+  { key: 'dojang_name', header: '도장명', width: '12%', align: 'left' },
+  { key: 'representative', header: '대표자', width: '10%', align: 'center' },
+  { key: 'phone', header: '연락처', width: '13%', align: 'center' },
+  { key: 'email', header: '이메일', width: '16%', align: 'left' },
+  { key: 'address', header: '주소', width: '18%', align: 'left' },
+  { key: 'requested_at', header: '요청 날짜', width: '9%', align: 'center' },
+  {
+    key: 'status',
+    header: '상태',
+    width: '8%',
+    align: 'center',
+    truncate: false,
+    render: (row) => (
+      <AdminBadge
+        label={row.status}
+        variant={DOJANG_STATUS_BADGE_VARIANT_MAP[row.status]}
+      />
+    ),
+  },
+  {
+    key: 'id',
+    header: '관리',
+    width: '14%',
+    align: 'center',
+    truncate: false,
+    render: (row) => <AdminSupportDojangActions row={row} />,
+  },
+];
+
+const REPORT_COLUMNS: AdminTableColumn<AdminReportRow>[] = [
+  { key: 'post_title', header: '게시글 제목', width: '18%', align: 'left' },
+  { key: 'reason', header: '사유', width: '14%', align: 'left' },
+  { key: 'reporter', header: '신고자', width: '9%', align: 'center' },
+  { key: 'reported_at', header: '신고 날짜', width: '9%', align: 'center' },
+  {
+    key: 'post_status_label',
+    header: '게시글 상태',
+    width: '8%',
+    align: 'center',
+    truncate: false,
+    render: (row) => (
+      <AdminBadge
+        label={row.post_status_label}
+        variant={REPORT_POST_STATUS_BADGE_VARIANT_MAP[row.post_status_label]}
+      />
+    ),
+  },
+  {
+    key: 'process_status',
+    header: '처리 상태',
+    width: '8%',
+    align: 'center',
+    truncate: false,
+    render: (row) => (
+      <AdminBadge
+        label={row.process_status}
+        variant={REPORT_STATUS_BADGE_VARIANT_MAP[row.process_status]}
+      />
+    ),
+  },
+  {
+    key: 'action_result',
+    header: '처리 결과',
+    width: '11%',
+    align: 'center',
+    truncate: false,
+    render: (row) =>
+      row.action_result === '-' ? (
+        <span className="text-sm text-zinc-400">-</span>
+      ) : (
+        <AdminBadge
+          label={row.action_result}
+          variant={REPORT_ACTION_BADGE_VARIANT_MAP[row.action_result]}
+        />
+      ),
+  },
+  { key: 'handled_at', header: '처리 날짜', width: '11%', align: 'center' },
+  {
+    key: 'id',
+    header: '관리',
+    width: '12%',
+    align: 'center',
+    truncate: false,
+    render: (row) => <AdminSupportReportActions row={row} />,
+  },
+];
+
+export default function AdminSupportTableClient({
+  dojangVerifications,
+  pageSize = ADMIN_TABLE_PAGE_SIZE,
+  reports,
+  totalCount,
+}: AdminSupportTableClientProps) {
+  const {
+    activeFilter: activeSection,
+    currentPage,
+    searchQuery,
+    setFilter,
+    setPage,
+    setSearchQuery,
+    commitSearch,
+    isPending,
+  } = useAdminTableQueryState<SupportSection>({
+    filterParamName: 'section',
+    defaultFilter: 'dojang',
+    validFilters: SUPPORT_SECTION_FILTERS.map((filter) => filter.value),
+    resetSearchOnFilterChange: true,
+  });
+
+  const searchPlaceholder =
+    activeSection === 'dojang'
+      ? '도장명, 주소 검색...'
+      : '신고 게시글 제목 검색...';
+  const searchAriaLabel =
+    activeSection === 'dojang'
+      ? '도장명 또는 주소 검색'
+      : '신고 게시글 제목 검색';
+
+  return (
+    <>
+      <AdminTableToolbar
+        filters={SUPPORT_SECTION_FILTERS}
+        activeFilter={activeSection}
+        onFilterChange={setFilter}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        onSearch={commitSearch}
+        searchPlaceholder={searchPlaceholder}
+        searchAriaLabel={searchAriaLabel}
+        isPending={isPending}
+      />
+
+      {activeSection === 'dojang' ? (
+        <AdminDataTable
+          caption="관리자 도장 인증 요청 목록"
+          columns={DOJANG_COLUMNS}
+          currentPage={currentPage}
+          data={dojangVerifications}
+          emptyMessage="도장 인증 요청이 없습니다."
+          getRowKey={(row) => row.id}
+          initialPageSize={pageSize}
+          isLoading={isPending}
+          onPageChange={setPage}
+          pageSizeOptions={[pageSize]}
+          serverPagination
+          totalItems={totalCount}
+        />
+      ) : (
+        <AdminDataTable
+          caption="관리자 신고 내역 목록"
+          columns={REPORT_COLUMNS}
+          currentPage={currentPage}
+          data={reports}
+          emptyMessage="신고 내역이 없습니다."
+          getRowKey={(row) => row.id}
+          initialPageSize={pageSize}
+          isLoading={isPending}
+          onPageChange={setPage}
+          pageSizeOptions={[pageSize]}
+          serverPagination
+          totalItems={totalCount}
+        />
+      )}
+    </>
+  );
+}

@@ -1,0 +1,464 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
+
+/* ─────────────────────────────────────────────────────────────────
+   @theme inline
+   · shadcn 토큰: 기존 var() 참조 유지
+   · Activio 시맨틱 토큰: 하드코딩 값 → var() 참조로 전환
+     실제 색상값은 :root (다크 기본값) / .dark / .light 에서 관리
+   ───────────────────────────────────────────────────────────────── */
+@theme inline {
+  /* shadcn 토큰 (변경 없음) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ── 텍스트 ── */
+  --color-text-primary: var(--color-text-primary);
+  --color-text-high: var(--color-text-high);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-text-hint: var(--color-text-hint);
+  --color-text-disabled: var(--color-text-disabled);
+  --color-input-text: var(--color-text-primary);     /* alias: input 텍스트 = primary */
+  --color-btn-text: var(--color-btn-text);
+
+  /* ── 배경 ── */
+  --color-bg-page: var(--color-bg-page);
+  --color-bg-surface: var(--color-bg-surface);
+  --color-bg-white: var(--color-bg-surface);          /* backward-compat alias */
+  --color-bg-surface-alt: var(--color-bg-surface-alt);
+  --color-bg-footer: var(--color-bg-footer);
+  --color-bg-tint: var(--color-bg-tint);
+  --color-surface-2: var(--color-surface-2);
+  --color-table-top: var(--color-surface-2);          /* alias */
+
+  /* ── 보더·구분선 ── */
+  --color-border: var(--color-border);
+  --color-border-medium: var(--color-border-medium);
+  --color-border-strong: var(--color-border-strong);
+
+  /* ── 버튼·인풋 ── */
+  --color-btn-basic: var(--color-btn-basic);
+  --color-input-bg: var(--color-bg-tint);             /* alias: input bg = tint */
+  --color-state-basic-bg: var(--color-bg-tint);       /* alias */
+
+  /* ── 오버레이·효과 ── */
+  --color-overlay: var(--color-overlay);
+  --color-highlight-shadow: var(--color-highlight-shadow);
+
+  /* ── 고정 색상 (다크/라이트 공통) ── */
+  --color-btn-focus: #2563eb;
+  --color-btn-focus-text: #ffffff;
+  --color-state-manager-text: #60a5fa;
+  --color-state-basic-text: #9ca3af;
+  --color-state-green-btn-fucus: #22c55e;
+  --color-state-yellow-btn-focus: #fbbf24;
+  --color-state-red-btn-focus: #ef4444;
+  --color-state-green-bg: rgba(34, 197, 94, 0.12);
+  --color-state-green-text: #4ade80;
+  --color-state-yellow: #fbbf24;
+  --color-state-manager-bg: rgba(37, 99, 235, 0.12);
+  --color-danger: #ef4444;
+  --color-auth-register: #60a5fa;
+  --color-auth-find-password: #60a5fa;
+  --color-error-not-found: #60a5fa;
+  --color-error-runtime: #ef4444;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   :root — 다크 모드 기본값 (defaultTheme="dark")
+   ───────────────────────────────────────────────────────────────── */
+:root {
+  /* shadcn */
+  --background: oklch(0.09 0 0);
+  --foreground: oklch(0.949 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.949 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.949 0 0);
+  --primary: oklch(0.5 0.243 264.376);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.949 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.63 0 0);
+  --accent: oklch(0.18 0 0);
+  --accent-foreground: oklch(0.949 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.5 0.243 264.376);
+  --chart-1: oklch(0.5 0.243 264.376);
+  --chart-2: oklch(0.63 0.165 160);
+  --chart-3: oklch(0.7 0.15 60);
+  --chart-4: oklch(0.6 0.18 300);
+  --chart-5: oklch(0.65 0.2 30);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.949 0 0);
+  --sidebar-primary: oklch(0.5 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.18 0 0);
+  --sidebar-accent-foreground: oklch(0.949 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.5 0.243 264.376);
+
+  /* Activio 시맨틱 토큰 — 다크 기본값 */
+  --color-text-primary: #ffffff;
+  --color-text-high: rgba(255, 255, 255, 0.85);
+  --color-text-secondary: rgba(255, 255, 255, 0.65);
+  --color-text-tertiary: rgba(255, 255, 255, 0.50);
+  --color-text-hint: rgba(255, 255, 255, 0.35);
+  --color-text-disabled: rgba(255, 255, 255, 0.20);
+  --color-btn-text: #9ca3af;
+
+  --color-bg-page: #111111;
+  --color-bg-surface: #252525;
+  --color-bg-surface-alt: #181818;
+  --color-bg-footer: #0a0a0a;
+  --color-bg-tint: rgba(255, 255, 255, 0.05);
+  --color-surface-2: #262626;
+
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-medium: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+
+  --color-btn-basic: rgba(255, 255, 255, 0.07);
+
+  --color-overlay: rgba(0, 0, 0, 0.60);
+  --color-highlight-shadow: rgba(255, 255, 255, 0.05);
+
+  /* 그라디언트 스크림 — RGB 채널만 정의해서 rgba(var(--color-scrim-rgb), opacity) 로 사용 */
+  --color-scrim-rgb: 17, 17, 17;
+
+  /* 이미지 히어로 전용 스크림 — 라이트/다크 무관하게 항상 어두운 값 고정 */
+  --color-hero-scrim-rgb: 10, 10, 10;
+
+  /* 헤더 네비게이션 배경 (rgba 조합 대신 직접 정의) */
+  --color-nav-bg: rgba(17, 17, 17, 0.96);
+
+  /* 브랜드 그라디언트 텍스트 (ACTIVIO 타이틀) */
+  --color-brand-grad-start: #ffffff;
+  --color-brand-grad-mid: #c8c8c8;
+  --color-brand-grad-end: #888888;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   .dark — 명시적 다크 모드 (setTheme('dark') 시 html.class="dark")
+   ───────────────────────────────────────────────────────────────── */
+.dark {
+  /* shadcn */
+  --background: oklch(0.09 0 0);
+  --foreground: oklch(0.949 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.949 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.949 0 0);
+  --primary: oklch(0.5 0.243 264.376);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.949 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.63 0 0);
+  --accent: oklch(0.18 0 0);
+  --accent-foreground: oklch(0.949 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.5 0.243 264.376);
+  --chart-1: oklch(0.5 0.243 264.376);
+  --chart-2: oklch(0.63 0.165 160);
+  --chart-3: oklch(0.7 0.15 60);
+  --chart-4: oklch(0.6 0.18 300);
+  --chart-5: oklch(0.65 0.2 30);
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.949 0 0);
+  --sidebar-primary: oklch(0.5 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.18 0 0);
+  --sidebar-accent-foreground: oklch(0.949 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.5 0.243 264.376);
+
+  /* Activio 시맨틱 토큰 — :root 다크 기본값과 동일 */
+  --color-text-primary: #ffffff;
+  --color-text-high: rgba(255, 255, 255, 0.85);
+  --color-text-secondary: rgba(255, 255, 255, 0.65);
+  --color-text-tertiary: rgba(255, 255, 255, 0.50);
+  --color-text-hint: rgba(255, 255, 255, 0.35);
+  --color-text-disabled: rgba(255, 255, 255, 0.20);
+  --color-btn-text: #9ca3af;
+
+  --color-bg-page: #111111;
+  --color-bg-surface: #252525;
+  --color-bg-surface-alt: #181818;
+  --color-bg-footer: #0a0a0a;
+  --color-bg-tint: rgba(255, 255, 255, 0.05);
+  --color-surface-2: #262626;
+
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-medium: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+
+  --color-btn-basic: rgba(255, 255, 255, 0.07);
+
+  --color-overlay: rgba(0, 0, 0, 0.60);
+  --color-highlight-shadow: rgba(255, 255, 255, 0.05);
+
+  --color-scrim-rgb: 17, 17, 17;
+
+  --color-hero-scrim-rgb: 10, 10, 10;
+
+  --color-nav-bg: rgba(17, 17, 17, 0.96);
+
+  --color-brand-grad-start: #ffffff;
+  --color-brand-grad-mid: #c8c8c8;
+  --color-brand-grad-end: #888888;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   .light — 라이트 모드 (setTheme('light') 시 html.class="light")
+   ───────────────────────────────────────────────────────────────── */
+.light {
+  /* shadcn */
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.09 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.09 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.09 0 0);
+  --primary: oklch(0.5 0.243 264.376);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.09 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.4 0 0);
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.09 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0 0 0 / 10%);
+  --input: oklch(0 0 0 / 10%);
+  --ring: oklch(0.5 0.243 264.376);
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.09 0 0);
+  --sidebar-border: oklch(0 0 0 / 10%);
+
+  /* Activio 시맨틱 토큰 — 라이트 오버라이드 */
+  --color-text-primary: #0f1117;
+  --color-text-high: rgba(0, 0, 0, 0.82);
+  --color-text-secondary: rgba(0, 0, 0, 0.65);
+  --color-text-tertiary: rgba(0, 0, 0, 0.55);
+  --color-text-hint: rgba(0, 0, 0, 0.45);
+  --color-text-disabled: rgba(0, 0, 0, 0.30);
+  --color-btn-text: #6b7280;
+
+  --color-bg-page: #eaecf1;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-alt: #f0f2f5;
+  --color-bg-footer: #e8eaed;
+  --color-bg-tint: rgba(0, 0, 0, 0.04);
+  --color-surface-2: #e8eaed;
+
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-medium: rgba(0, 0, 0, 0.12);
+  --color-border-strong: rgba(0, 0, 0, 0.18);
+
+  --color-btn-basic: rgba(0, 0, 0, 0.06);
+
+  --color-overlay: rgba(0, 0, 0, 0.55);
+  --color-highlight-shadow: rgba(0, 0, 0, 0.04);
+
+  --color-scrim-rgb: 245, 247, 250;
+
+  --color-nav-bg: rgba(234, 236, 241, 0.97);
+
+  --color-brand-grad-start: #1a1a2e;
+  --color-brand-grad-mid: #374151;
+  --color-brand-grad-end: #6b7280;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+  }
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-btn-focus);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* ── Home slideshow (6 images, 5s each = 30s total) ── */
+@keyframes bgSlide1 {
+  0%,13.33%   { opacity: 1; }
+  16.66%,83.33% { opacity: 0; }
+  100%         { opacity: 1; }
+}
+@keyframes bgSlide2 {
+  0%,13.33%    { opacity: 0; }
+  16.66%,30%   { opacity: 1; }
+  33.33%,100%  { opacity: 0; }
+}
+@keyframes bgSlide3 {
+  0%,30%       { opacity: 0; }
+  33.33%,46.66% { opacity: 1; }
+  50%,100%     { opacity: 0; }
+}
+@keyframes bgSlide4 {
+  0%,46.66%    { opacity: 0; }
+  50%,63.33%   { opacity: 1; }
+  66.66%,100%  { opacity: 0; }
+}
+@keyframes bgSlide5 {
+  0%,63.33%    { opacity: 0; }
+  66.66%,80%   { opacity: 1; }
+  83.33%,100%  { opacity: 0; }
+}
+@keyframes bgSlide6 {
+  0%,80%       { opacity: 0; }
+  83.33%,96.66% { opacity: 1; }
+  100%         { opacity: 0; }
+}
+.home-bg-1 { animation: bgSlide1 30s ease-in-out infinite; }
+.home-bg-2 { animation: bgSlide2 30s ease-in-out infinite; }
+.home-bg-3 { animation: bgSlide3 30s ease-in-out infinite; }
+.home-bg-4 { animation: bgSlide4 30s ease-in-out infinite; }
+.home-bg-5 { animation: bgSlide5 30s ease-in-out infinite; }
+.home-bg-6 { animation: bgSlide6 30s ease-in-out infinite; }
+
+/* ── 스크롤바 숨김 ── */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── 도장찾기 반응형 레이아웃 ── */
+.dojang-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.dojang-panel {
+  width: 100%;
+  flex-shrink: 0;
+  height: 260px;
+  background: var(--color-bg-surface);
+  border-right: none;
+  border-top: 1px solid var(--color-border);
+  overflow-y: auto;
+  padding: 14px;
+  order: 2;
+}
+.dojang-map {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  order: 1;
+}
+@media (min-width: 768px) {
+  .dojang-body {
+    flex-direction: row;
+  }
+  .dojang-panel {
+    width: 288px;
+    flex-shrink: 0;
+    height: auto;
+    border-right: 1px solid var(--color-border);
+    border-top: none;
+    order: 1;
+  }
+  .dojang-map {
+    order: 2;
+  }
+}
+
+/* ── 대회 컨텐츠 반응형 그리드 ── */
+@media (min-width: 1024px) {
+  .competition-content-grid {
+    grid-template-columns: 1fr 300px !important;
+    padding: 32px 48px !important;
+  }
+}
+
+/* ── 푸터 하단 Nav+Platform 행 ── */
+.footer-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 24px;
+}
+@media (min-width: 768px) {
+  .footer-columns {
+    flex-direction: row !important;
+    gap: 40px !important;
+  }
+  .footer-content {
+    padding: 48px 48px 0 !important;
+  }
+  /* 데스크탑에서는 wrapper를 투명하게 처리 → 자식들이 직접 flex row에 참여 */
+  .footer-bottom-row {
+    display: contents;
+  }
+}
