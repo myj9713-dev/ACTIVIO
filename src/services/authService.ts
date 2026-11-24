@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export async function registerGeneral({
   email,
@@ -75,13 +75,13 @@ export async function uploadBusinessFile(file: File): Promise<string> {
   const ext = file.name.split('.').pop();
   const fileName = `${Date.now()}.${ext}`;
 
-  const { error } = await supabase.storage
-    .from('business-files')
+  const { error } = await getSupabaseBrowserClient()
+    .storage.from('business-files')
     .upload(fileName, file);
   if (error) throw error;
 
-  const { data } = supabase.storage
-    .from('business-files')
+  const { data } = getSupabaseBrowserClient()
+    .storage.from('business-files')
     .getPublicUrl(fileName);
   return data.publicUrl;
 }
@@ -93,13 +93,14 @@ export async function loginUser({
   email: string;
   password: string;
 }) {
-  const { error, data } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { error, data } =
+    await getSupabaseBrowserClient().auth.signInWithPassword({
+      email,
+      password,
+    });
   if (error) throw error;
 
-  const { data: profile } = await supabase
+  const { data: profile } = await getSupabaseBrowserClient()
     .from('profiles')
     .select('nickname, role')
     .eq('id', data.user.id)

@@ -1,10 +1,11 @@
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import type { Competition } from '@/types/competition';
 
 export async function getCompetitions(page = 0, pageSize = 10) {
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
-  const { error, data } = await supabase
+  const { error, data } = await getSupabaseBrowserClient()
     .from('competition')
     .select('*')
     .is('deleted_at', null)
@@ -13,7 +14,7 @@ export async function getCompetitions(page = 0, pageSize = 10) {
 
   if (error) throw error;
 
-  return data.map((competition) => ({
+  return data.map((competition: Competition) => ({
     ...competition,
     comment_count: 0,
   }));

@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export async function createCompetition({
   name,
@@ -21,7 +21,7 @@ export async function createCompetition({
   user_id?: string;
   participants?: number;
 }) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseBrowserClient()
     .from('competition')
     .insert({
       name,
@@ -43,12 +43,12 @@ export async function createCompetition({
 export async function uploadCompetitionImage(file: File): Promise<string> {
   const ext = file.name.split('.').pop();
   const fileName = `${Date.now()}.${ext}`;
-  const { error } = await supabase.storage
-    .from('competition-images')
+  const { error } = await getSupabaseBrowserClient()
+    .storage.from('competition-images')
     .upload(fileName, file);
   if (error) throw error;
-  const { data } = supabase.storage
-    .from('competition-images')
+  const { data } = getSupabaseBrowserClient()
+    .storage.from('competition-images')
     .getPublicUrl(fileName);
   return data.publicUrl;
 }
@@ -66,7 +66,7 @@ export async function updateCompetition(
     participants?: number;
   },
 ) {
-  const { error } = await supabase
+  const { error } = await getSupabaseBrowserClient()
     .from('competition')
     .update(fields)
     .eq('id', id);
@@ -74,7 +74,7 @@ export async function updateCompetition(
 }
 
 export async function deleteCompetition(id: string) {
-  const { error } = await supabase
+  const { error } = await getSupabaseBrowserClient()
     .from('competition')
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', id);

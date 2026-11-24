@@ -5,15 +5,25 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { usePromoPosts } from '@/hooks/useCommunity';
 import { buildPostUrl } from '@/lib/slug';
 
+interface PromoPostItem {
+  id: string;
+  title: string;
+  content: string;
+  nickname?: string;
+}
+
 export default function PromoAdBannerMobile() {
-  const { data: posts = [] } = usePromoPosts();
+  const { data: rawPosts = [] } = usePromoPosts();
+  const posts = rawPosts as PromoPostItem[];
+
   const [activeGroup, setActiveGroup] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
 
   const totalGroups = Math.ceil(posts.length / 2);
-  const groups = Array.from({ length: totalGroups }, (_, i) =>
-    posts.slice(i * 2, (i + 1) * 2),
+  const groups: PromoPostItem[][] = Array.from(
+    { length: totalGroups },
+    (_, i) => posts.slice(i * 2, (i + 1) * 2),
   );
 
   useEffect(() => {
@@ -35,7 +45,10 @@ export default function PromoAdBannerMobile() {
 
   const scrollToGroup = useCallback((i: number) => {
     if (!scrollRef.current) return;
-    scrollRef.current.scrollTo({ left: i * scrollRef.current.clientWidth, behavior: 'smooth' });
+    scrollRef.current.scrollTo({
+      left: i * scrollRef.current.clientWidth,
+      behavior: 'smooth',
+    });
   }, []);
 
   if (posts.length === 0) return null;
@@ -56,7 +69,7 @@ export default function PromoAdBannerMobile() {
         }}
         onScroll={handleScroll}
       >
-        {groups.map((group, groupIdx) => (
+        {groups.map((group: PromoPostItem[], groupIdx: number) => (
           <div
             key={groupIdx}
             style={{
@@ -66,7 +79,7 @@ export default function PromoAdBannerMobile() {
               gap: '12px',
             }}
           >
-            {group.map((post) => (
+            {group.map((post: PromoPostItem) => (
               <Link
                 key={post.id}
                 href={buildPostUrl(post.title, post.id)}
@@ -83,13 +96,21 @@ export default function PromoAdBannerMobile() {
                   gap: '3px',
                   transition: 'opacity 0.12s',
                 }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.opacity = '0.85';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.opacity = '1';
+                }}
               >
                 <p
                   style={{
-                    fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em',
-                    textTransform: 'uppercase', color: 'var(--color-text-disabled)', marginBottom: '2px',
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: 'var(--color-text-disabled)',
+                    marginBottom: '2px',
                   }}
                 >
                   홍보
@@ -97,8 +118,11 @@ export default function PromoAdBannerMobile() {
                 {post.nickname && (
                   <p
                     style={{
-                      fontSize: '10px', color: 'var(--color-text-hint)',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      fontSize: '10px',
+                      color: 'var(--color-text-hint)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {post.nickname}
@@ -106,7 +130,9 @@ export default function PromoAdBannerMobile() {
                 )}
                 <p
                   style={{
-                    fontSize: '12.5px', fontWeight: 600, color: 'var(--color-text-high)',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    color: 'var(--color-text-high)',
                     lineHeight: 1.35,
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
@@ -118,8 +144,12 @@ export default function PromoAdBannerMobile() {
                 </p>
                 <p
                   style={{
-                    fontSize: '10.5px', color: 'var(--color-text-disabled)', marginTop: '2px',
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    fontSize: '10.5px',
+                    color: 'var(--color-text-disabled)',
+                    marginTop: '2px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {post.content.slice(0, 35)}
@@ -161,7 +191,10 @@ export default function PromoAdBannerMobile() {
                   width: i === activeGroup ? '16px' : '6px',
                   height: '6px',
                   borderRadius: '3px',
-                  background: i === activeGroup ? '#2563eb' : 'var(--color-text-disabled)',
+                  background:
+                    i === activeGroup
+                      ? '#2563eb'
+                      : 'var(--color-text-disabled)',
                   transition: 'all 0.3s',
                 }}
               />

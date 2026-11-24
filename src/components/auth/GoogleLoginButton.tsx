@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 interface GoogleLoginButtonProps {
   nextPath?: string;
@@ -22,7 +22,7 @@ export function GoogleLoginButton({ nextPath }: GoogleLoginButtonProps) {
       }
       const redirectTo = callbackUrl.toString();
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error } = await getSupabaseBrowserClient().auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo,
