@@ -1,5 +1,5 @@
 import 'server-only';
-import { supabasePublic } from '@/lib/supabase/public';
+import { getSupabasePublicClient } from '@/lib/supabase/public';
 import { cacheLife, cacheTag } from 'next/cache';
 import type { Post, Comment } from '@/types/community';
 
@@ -8,7 +8,7 @@ export async function getPost(id: string): Promise<Post | null> {
   cacheTag(`post-${id}`);
   cacheLife('minutes');
 
-  const { data, error } = await supabasePublic
+  const { data, error } = await getSupabasePublicClient()
     .from('posts')
     .select('*, profiles(nickname, avatar_url, belt_level, role)')
     .eq('id', id)
@@ -33,7 +33,7 @@ export async function getComments(postId: string): Promise<Comment[]> {
   cacheTag(`comments-${postId}`);
   cacheLife('minutes');
 
-  const { data, error } = await supabasePublic
+  const { data, error } = await getSupabasePublicClient()
     .from('comments')
     .select('*, profiles(nickname, avatar_url, belt_level, role)')
     .eq('post_id', postId)

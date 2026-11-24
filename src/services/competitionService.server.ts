@@ -1,5 +1,5 @@
 import 'server-only';
-import { supabasePublic } from '@/lib/supabase/public';
+import { getSupabasePublicClient } from '@/lib/supabase/public';
 import { cacheLife, cacheTag } from 'next/cache';
 import type { Competition } from '@/types/competition';
 
@@ -8,7 +8,7 @@ export async function getCompetition(id: string): Promise<Competition | null> {
   cacheTag(`competition-${id}`);
   cacheLife('minutes');
 
-  const { data, error } = await supabasePublic
+  const { data, error } = await getSupabasePublicClient()
     .from('competition')
     .select('*, profiles(nickname, avatar_url, role)')
     .eq('id', id)

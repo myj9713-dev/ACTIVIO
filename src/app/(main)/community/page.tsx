@@ -1,5 +1,5 @@
 import CommunityClient from '@/components/community/CommunityClient';
-import { supabasePublic } from '@/lib/supabase/public';
+import { getSupabasePublicClient } from '@/lib/supabase/public';
 import { cacheTag, cacheLife } from 'next/cache';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { Post } from '@/types/community';
@@ -20,7 +20,7 @@ async function getPosts(): Promise<Post[]> {
   cacheTag('posts-list');
   cacheLife('minutes');
 
-  const { data, error } = await supabasePublic
+  const { data, error } = await getSupabasePublicClient()
     .from('posts')
     .select('*, active_comment_counts(count), profiles(nickname, avatar_url)')
     .is('deleted_at', null)
