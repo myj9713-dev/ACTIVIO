@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { supabasePublic } from '@/lib/supabase/public';
+import { getSupabasePublicClient } from '@/lib/supabase/public';
 import { cacheTag, cacheLife } from 'next/cache';
 import type { Metadata } from 'next';
 import DashboardClient from '@/components/dashboard/DashboardClient';
@@ -14,7 +14,7 @@ async function getUpcomingCompetitions() {
   cacheTag('competitions');
   cacheLife('minutes');
 
-  const { data } = await supabasePublic
+  const { data } = await getSupabasePublicClient()
     .from('competition')
     .select('id, name, location, event_data, apply_deadline')
     .is('deleted_at', null)
@@ -29,7 +29,7 @@ async function getLatestNotice() {
   cacheTag('posts-list');
   cacheLife('minutes');
 
-  const { data } = await supabasePublic
+  const { data } = await getSupabasePublicClient()
     .from('posts')
     .select('id, title, content, image_url, created_at, profiles(nickname)')
     .is('deleted_at', null)

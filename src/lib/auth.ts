@@ -1,4 +1,4 @@
-import { supabase } from './supabase/client';
+import { getSupabaseBrowserClient } from './supabase/client';
 import type { AppRole } from '@/types/role';
 
 export type { AppRole };
@@ -14,10 +14,10 @@ export type AuthUser = {
 export async function getCurrentUser(): Promise<AuthUser> {
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSupabaseBrowserClient().auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  const { data: profile } = await getSupabaseBrowserClient()
     .from('profiles')
     .select('name, role, belt_level, avatar_url, nickname')
     .eq('id', user.id)

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { supabasePublic } from '@/lib/supabase/public';
+import { getSupabasePublicClient } from '@/lib/supabase/public';
 import { cacheTag, cacheLife } from 'next/cache';
 import { getSportBySlug } from '@/constants/sports';
 import SportCommunityClient from '@/components/community/SportCommunityClient';
@@ -27,7 +27,7 @@ async function getPosts(slug: string): Promise<Post[]> {
   cacheTag(`posts-sport-${slug}`);
   cacheLife('minutes');
 
-  const { data, error } = await supabasePublic
+  const { data, error } = await getSupabasePublicClient()
     .from('posts')
     .select('*, active_comment_counts(count), profiles(nickname, avatar_url)')
     .is('deleted_at', null)

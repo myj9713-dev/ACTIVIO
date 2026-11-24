@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
 export default function HomeLoggedInButtons() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await getSupabaseBrowserClient().auth.signOut();
     router.refresh();
   };
 

@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import type { Post, PostCategory } from '@/types/community';
 
 interface ProfileBase {
@@ -6,11 +6,28 @@ interface ProfileBase {
   avatar_url: string;
 }
 
-export async function getPosts(page = 0, pageSize = 10) {
+interface CommentCountRow {
+  count: number;
+}
+
+interface PostQueryRow {
+  active_comment_counts?: CommentCountRow[] | null;
+  profiles?: ProfileBase | null;
+  [key: string]: unknown;
+}
+
+interface PromoPostQueryRow {
+  id: string;
+  title: string;
+  content: string;
+  profiles?: ProfileBase | null;
+}
+
+export async function getPosts(page = 0, pageSize = 10): Promise<Post[]> {
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseBrowserClient()
     .from('posts')
     .select('*, active_comment_counts(count), profiles(nickname, avatar_url)')
     .is('deleted_at', null)
@@ -20,21 +37,29 @@ export async function getPosts(page = 0, pageSize = 10) {
 
   if (error) throw error;
 
-  return data.map((post) => ({
-    ...post,
-    comment_count:
-      (post.active_comment_counts as { count: number }[])[0]?.count ?? 0,
-    nickname: (post.profiles as ProfileBase | null)?.nickname,
-    avatar_url: (post.profiles as ProfileBase | null)?.avatar_url,
-    profiles: undefined,
-  }));
+  const rows = (data ?? []) as unknown as PostQueryRow[];
+
+  return rows.map(
+    (post) =>
+      ({
+        ...post,
+        comment_count: post.active_comment_counts?.[0]?.count ?? 0,
+        nickname: post.profiles?.nickname,
+        avatar_url: post.profiles?.avatar_url,
+        profiles: undefined,
+      }) as unknown as Post,
+  );
 }
 
-export async function getSportPosts(sport: string, page = 0, pageSize = 10) {
+export async function getSportPosts(
+  sport: string,
+  page = 0,
+  pageSize = 10,
+): Promise<Post[]> {
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseBrowserClient()
     .from('posts')
     .select('*, active_comment_counts(count), profiles(nickname, avatar_url)')
     .is('deleted_at', null)
@@ -45,18 +70,22 @@ export async function getSportPosts(sport: string, page = 0, pageSize = 10) {
 
   if (error) throw error;
 
-  return data.map((post) => ({
-    ...post,
-    comment_count:
-      (post.active_comment_counts as { count: number }[])[0]?.count ?? 0,
-    nickname: (post.profiles as ProfileBase | null)?.nickname,
-    avatar_url: (post.profiles as ProfileBase | null)?.avatar_url,
-    profiles: undefined,
-  }));
+  const rows = (data ?? []) as unknown as PostQueryRow[];
+
+  return rows.map(
+    (post) =>
+      ({
+        ...post,
+        comment_count: post.active_comment_counts?.[0]?.count ?? 0,
+        nickname: post.profiles?.nickname,
+        avatar_url: post.profiles?.avatar_url,
+        profiles: undefined,
+      }) as unknown as Post,
+  );
 }
 
 export async function getPromoPosts(limit = 20) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseBrowserClient()
     .from('posts')
     .select('id, title, content, profiles(nickname)')
     .is('deleted_at', null)
@@ -67,11 +96,13 @@ export async function getPromoPosts(limit = 20) {
 
   if (error) throw error;
 
-  return (data ?? []).map((post) => ({
-    id: post.id as string,
-    title: post.title as string,
-    content: post.content as string,
-    nickname: (post.profiles as unknown as ProfileBase | null)?.nickname ?? '',
+  const rows = (data ?? []) as unknown as PromoPostQueryRow[];
+
+  return rows.map((post) => ({
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    nickname: post.profiles?.nickname ?? '',
   }));
 }
 
@@ -108,7 +139,15 @@ export async function createPost({
   const res = await fetch('/api/posts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ category, title, content, image_url, video_url, sport, user_id }),
+    body: JSON.stringify({
+      category,
+      title,
+      content,
+      image_url,
+      video_url,
+      sport,
+      user_id,
+    }),
   });
   if (!res.ok) throw new Error('게시글 작성 실패');
   const { post } = await res.json();
@@ -117,7 +156,12 @@ export async function createPost({
 
 export async function updatePost(
   id: string,
-  fields: { title: string; content: string; image_url?: string | null; video_url?: string | null },
+  fields: {
+    title: string;
+    content: string;
+    image_url?: string | null;
+    video_url?: string | null;
+  },
 ) {
   const res = await fetch(`/api/posts/${id}`, {
     method: 'PUT',
@@ -137,25 +181,29 @@ export async function deletePost(id: string) {
 export async function uploadPostImage(file: File): Promise<string> {
   const ext = file.name.split('.').pop();
   const fileName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage
-    .from('post-images')
+  const { error } = await getSupabaseBrowserClient()
+    .storage.from('post-images')
     .upload(fileName, file);
   if (error) throw error;
-  const { data } = supabase.storage.from('post-images').getPublicUrl(fileName);
+  const { data } = getSupabaseBrowserClient()
+    .storage.from('post-images')
+    .getPublicUrl(fileName);
   return data.publicUrl;
 }
 
 export async function uploadPostVideo(file: File): Promise<string> {
   const ext = file.name.split('.').pop();
   const fileName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage
-    .from('post-videos')
+  const { error } = await getSupabaseBrowserClient()
+    .storage.from('post-videos')
     .upload(fileName, file, { contentType: file.type, cacheControl: '3600' });
   if (error) {
     console.error('[uploadPostVideo] Supabase error:', error);
     throw error;
   }
-  const { data } = supabase.storage.from('post-videos').getPublicUrl(fileName);
+  const { data } = getSupabaseBrowserClient()
+    .storage.from('post-videos')
+    .getPublicUrl(fileName);
   return data.publicUrl;
 }
 

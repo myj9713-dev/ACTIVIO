@@ -6,6 +6,7 @@ import AdminTopNav from '@/components/admin/AdminTopNav';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ScrollToTop from '@/components/common/ScrollToTop';
 import { ADMIN_LAYOUT_METADATA } from '@/constants/adminMeta';
+import { isAdminRole } from '@/lib/role';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = ADMIN_LAYOUT_METADATA;
@@ -25,7 +26,7 @@ async function requireAdminAccess() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (profileError || !profile || profile.role !== 'admin') notFound();
+  if (profileError || !profile || !isAdminRole(profile.role)) notFound();
 }
 
 async function AdminContent({ children }: { children: React.ReactNode }) {

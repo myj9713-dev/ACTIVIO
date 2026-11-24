@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase/client';
+import type { Session } from '@supabase/supabase-js';
+import { getSupabaseBrowserClient } from '../lib/supabase/client';
 import { getCurrentUser, AuthUser } from '../lib/auth';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -10,20 +11,22 @@ export function useAuth() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        getCurrentUser().then((u) => {
-          setUser(u);
+    getSupabaseBrowserClient()
+      .auth.getSession()
+      .then(({ data }: { data: { session: Session | null } }) => {
+        if (data.session) {
+          getCurrentUser().then((u) => {
+            setUser(u);
+            setLoading(false);
+          });
+        } else {
           setLoading(false);
-        });
-      } else {
-        setLoading(false);
-      }
-    });
+        }
+      });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
+    } = getSupabaseBrowserClient().auth.onAuthStateChange(() => {
       getCurrentUser().then(setUser);
     });
 
@@ -42,7 +45,7 @@ export function useAuth() {
 
   const logout = async () => {
     queryClient.clear();
-    await supabase.auth.signOut();
+    await getSupabaseBrowserClient().auth.signOut();
     setUser(null);
     window.location.href = '/community';
   };

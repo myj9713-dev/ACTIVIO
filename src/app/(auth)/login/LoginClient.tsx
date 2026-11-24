@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import useAuthStore from '@/store/authStore';
 import { loginUser } from '@/services/authService';
+import { GoogleLoginButton } from '@/components/auth/GoogleLoginButton';
+import { getHomePathByRole } from '@/lib/role';
 
 const loginSchema = z.object({
   email: z.string().email('올바른 이메일 형식으로 작성해주세요.'),
@@ -55,8 +57,7 @@ export default function LoginClient() {
         role: profile?.role ?? '',
       });
 
-      const redirectPath = profile?.role === 'admin' ? '/admin' : '/dashboard';
-      router.push(redirectPath);
+      router.push(getHomePathByRole(profile?.role));
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -71,8 +72,8 @@ export default function LoginClient() {
   return (
     <>
       <p
-        className="text-center mb-6"
-        style={{ fontSize: '16px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.01em' }}
+        className="text-center mb-6 text-text-primary"
+        style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0.01em' }}
       >
         스포츠인 올인원 커뮤니티에 오신 것을 환영합니다
       </p>
@@ -142,7 +143,11 @@ export default function LoginClient() {
                 tabIndex={-1}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors"
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
             </div>
             <div className="h-5 mt-1">
@@ -191,6 +196,14 @@ export default function LoginClient() {
             </Link>
           </p>
         </form>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-text-secondary/20" />
+          <span className="text-xs font-medium text-text-secondary">또는</span>
+          <div className="h-px flex-1 bg-text-secondary/20" />
+        </div>
+
+        <GoogleLoginButton />
       </div>
     </>
   );

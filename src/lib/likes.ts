@@ -1,7 +1,7 @@
-import { supabase } from './supabase/client';
+import { getSupabaseBrowserClient } from './supabase/client';
 
 export async function getLikesCount(postId: string) {
-  const { count } = await supabase
+  const { count } = await getSupabaseBrowserClient()
     .from('likes')
     .select('*', { count: 'exact' })
     .eq('post_id', postId);
@@ -9,7 +9,7 @@ export async function getLikesCount(postId: string) {
 }
 
 export async function getIsLiked(postId: string, userId: string) {
-  const { data } = await supabase
+  const { data } = await getSupabaseBrowserClient()
     .from('likes')
     .select('*')
     .eq('post_id', postId)
@@ -24,12 +24,14 @@ export async function toggleLike(
   isLiked: boolean,
 ) {
   if (isLiked) {
-    await supabase
+    await getSupabaseBrowserClient()
       .from('likes')
       .delete()
       .eq('post_id', postId)
       .eq('user_id', userId);
   } else {
-    await supabase.from('likes').insert({ post_id: postId, user_id: userId });
+    await getSupabaseBrowserClient()
+      .from('likes')
+      .insert({ post_id: postId, user_id: userId });
   }
 }

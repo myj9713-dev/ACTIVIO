@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 export function useUserRole() {
   const [userRole, setUserRole] = useState<string | null>(null);
 
@@ -7,10 +7,10 @@ export function useUserRole() {
     const fetchUserRole = async () => {
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await getSupabaseBrowserClient().auth.getUser();
       if (!user) return;
 
-      const { data } = await supabase
+      const { data } = await getSupabaseBrowserClient()
         .from('profiles')
         .select('role')
         .eq('id', user.id)

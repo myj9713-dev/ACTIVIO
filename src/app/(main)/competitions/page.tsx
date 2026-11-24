@@ -1,5 +1,5 @@
 import CompetitionClient from '@/components/competition/CompetitionClient';
-import { supabasePublic } from '@/lib/supabase/public';
+import { getSupabasePublicClient } from '@/lib/supabase/public';
 import { cacheTag, cacheLife } from 'next/cache';
 import type { Metadata } from 'next';
 
@@ -17,7 +17,7 @@ async function getCompetitions() {
   cacheTag('competitions');
   cacheLife('minutes');
 
-  const { data } = await supabasePublic
+  const { data } = await getSupabasePublicClient()
     .from('competition')
     .select('*')
     .is('deleted_at', null)

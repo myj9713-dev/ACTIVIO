@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { Profile } from '@/types/user';
 import { ProfileUpdateForm, MyPost } from '@/types/mypage';
 import { normalizeBeltLevel } from '@/constants/belt';
@@ -10,7 +10,7 @@ import {
 async function getAuthUser() {
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSupabaseBrowserClient().auth.getUser();
   if (!user) throw new Error('로그인이 필요합니다.');
   return user;
 }
@@ -32,7 +32,7 @@ interface PostQueryRow {
 export async function fetchMyProfile(): Promise<Profile> {
   const user = await getAuthUser();
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseBrowserClient()
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -73,7 +73,7 @@ export async function updateMyProfile(
     throw new Error('이미 사용 중인 닉네임입니다.');
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseBrowserClient()
     .from('profiles')
     .update({
       ...form,
@@ -98,7 +98,7 @@ export async function fetchMyPosts(page: number): Promise<MyPost[]> {
   const from = page * limit;
   const to = from + limit - 1;
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseBrowserClient()
     .from('posts')
     .select(
       `
@@ -125,8 +125,9 @@ export async function fetchMyPosts(page: number): Promise<MyPost[]> {
 
   if (error) throw error;
 
-  return (data ?? [])
-    .map((post) => post as unknown as PostQueryRow)
+  const rows = (data ?? []) as unknown as PostQueryRow[];
+
+  return rows
     .filter((post) => post.deleted_at === null && post.status === 'published')
     .map((post) => ({
       id: post.id,
@@ -141,6 +142,7 @@ export async function fetchMyPosts(page: number): Promise<MyPost[]> {
       comment_count: post.active_comment_counts?.[0]?.count ?? 0,
     }));
 }
+
 export async function deleteMyAccount(): Promise<void> {
   const user = await getAuthUser();
 
@@ -152,16 +154,16 @@ export async function deleteMyAccount(): Promise<void> {
 
   if (!res.ok) throw new Error('회원탈퇴에 실패했습니다.');
 
-  await supabase.auth.signOut();
+  await getSupabaseBrowserClient().auth.signOut();
 }
 
 export async function fetchMyPostCount(): Promise<number> {
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSupabaseBrowserClient().auth.getUser();
   if (!user) return 0;
 
-  const { count } = await supabase
+  const { count } = await getSupabaseBrowserClient()
     .from('posts')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
@@ -174,10 +176,10 @@ export async function fetchMyPostCount(): Promise<number> {
 export async function fetchMyCommentCount(): Promise<number> {
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSupabaseBrowserClient().auth.getUser();
   if (!user) return 0;
 
-  const { data: posts } = await supabase
+  const { data: posts } = await getSupabaseBrowserClient()
     .from('posts')
     .select('id')
     .is('deleted_at', null)
@@ -185,9 +187,9 @@ export async function fetchMyCommentCount(): Promise<number> {
 
   if (!posts || posts.length === 0) return 0;
 
-  const postIds = posts.map((p) => p.id);
+  const postIds = (posts as { id: string }[]).map((p) => p.id);
 
-  const { count } = await supabase
+  const { count } = await getSupabaseBrowserClient()
     .from('comments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
@@ -200,10 +202,10 @@ export async function fetchMyCommentCount(): Promise<number> {
 export async function fetchMyLikeCount(): Promise<number> {
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSupabaseBrowserClient().auth.getUser();
   if (!user) return 0;
 
-  const { data: posts } = await supabase
+  const { data: posts } = await getSupabaseBrowserClient()
     .from('posts')
     .select('id')
     .eq('user_id', user.id)
@@ -212,9 +214,9 @@ export async function fetchMyLikeCount(): Promise<number> {
 
   if (!posts || posts.length === 0) return 0;
 
-  const postIds = posts.map((p) => p.id);
+  const postIds = (posts as { id: string }[]).map((p) => p.id);
 
-  const { count } = await supabase
+  const { count } = await getSupabaseBrowserClient()
     .from('likes')
     .select('*', { count: 'exact', head: true })
     .in('post_id', postIds);
