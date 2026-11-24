@@ -13,6 +13,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { isAdminRole } from '@/lib/role';
 
 const navItems = [
   { label: '커뮤니티', href: '/community', icon: '/whitebelt.svg' },
@@ -35,7 +36,7 @@ const adminNavItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = isAdminRole(user?.role);
 
   const handleLogout = async () => {
     await logout();

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/hooks/useAuth';
+import { isAdminRole } from '@/lib/role';
 
 const NAV_ITEMS = [
   { label: '커뮤니티', href: '/community' },
@@ -188,7 +189,7 @@ export default function TopNav() {
                            border border-white/10 light:border-black/[0.1] shadow-2xl"
                 style={{ background: 'var(--color-bg-surface)' }}
               >
-                {user.role === 'admin' && (
+                {isAdminRole(user.role) && (
                   <>
                     <Link
                       href="/admin"
@@ -291,7 +292,7 @@ export default function TopNav() {
                 </Link>
               );
             })}
-            {!loading && user && user.role === 'admin' && (
+            {!loading && user && isAdminRole(user.role) && (
               <Link
                 href="/admin"
                 onClick={() => setMenuOpen(false)}

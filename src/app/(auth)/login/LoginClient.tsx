@@ -8,6 +8,7 @@ import { z } from 'zod';
 import useAuthStore from '@/store/authStore';
 import { loginUser } from '@/services/authService';
 import { GoogleLoginButton } from '@/components/auth/GoogleLoginButton';
+import { getHomePathByRole } from '@/lib/role';
 
 const loginSchema = z.object({
   email: z.string().email('올바른 이메일 형식으로 작성해주세요.'),
@@ -56,8 +57,7 @@ export default function LoginClient() {
         role: profile?.role ?? '',
       });
 
-      const redirectPath = profile?.role === 'admin' ? '/admin' : '/dashboard';
-      router.push(redirectPath);
+      router.push(getHomePathByRole(profile?.role));
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -203,7 +203,7 @@ export default function LoginClient() {
           <div className="h-px flex-1 bg-text-secondary/20" />
         </div>
 
-        <GoogleLoginButton nextPath="/dashboard" />
+        <GoogleLoginButton />
       </div>
     </>
   );

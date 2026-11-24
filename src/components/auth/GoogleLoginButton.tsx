@@ -7,9 +7,7 @@ interface GoogleLoginButtonProps {
   nextPath?: string;
 }
 
-export function GoogleLoginButton({
-  nextPath = '/dashboard',
-}: GoogleLoginButtonProps) {
+export function GoogleLoginButton({ nextPath }: GoogleLoginButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -18,7 +16,11 @@ export function GoogleLoginButton({
     setIsLoading(true);
 
     try {
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+      const callbackUrl = new URL('/auth/callback', window.location.origin);
+      if (nextPath) {
+        callbackUrl.searchParams.set('next', nextPath);
+      }
+      const redirectTo = callbackUrl.toString();
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
