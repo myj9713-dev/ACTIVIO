@@ -3,6 +3,7 @@ import { getSupabasePublicClient } from '@/lib/supabase/public';
 import { cacheTag, cacheLife } from 'next/cache';
 import type { Metadata } from 'next';
 import DashboardClient from '@/components/dashboard/DashboardClient';
+import { fetchAllSportsNews } from '@/services/news/fetchSportsNews';
 
 export const metadata: Metadata = {
   title: '대시보드 | Activio',
@@ -40,18 +41,23 @@ async function getLatestNotice() {
 
   return (data ?? []).map((p) => ({
     ...p,
-    nickname: (p.profiles as unknown as { nickname: string } | null)?.nickname ?? '관리자',
+    nickname:
+      (p.profiles as unknown as { nickname: string } | null)?.nickname ??
+      '관리자',
     profiles: undefined,
   }));
 }
 
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const [competitions, notices] = await Promise.all([
+  const [competitions, notices, newsResult] = await Promise.all([
     getUpcomingCompetitions(),
     getLatestNotice(),
+    fetchAllSportsNews({ perCategoryDisplay: 2 }),
   ]);
 
   if (!user) {
@@ -61,14 +67,28 @@ export default async function DashboardPage() {
         stats={null}
         competitions={competitions}
         notices={notices}
+        news={newsResult.items}
+        newsError={newsResult.isError}
       />
     );
   }
 
   const [profileRes, postCountRes, commentCountRes] = await Promise.all([
-    supabase.from('profiles').select('nickname, avatar_url, role, belt_level').eq('id', user.id).single(),
-    supabase.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).is('deleted_at', null),
-    supabase.from('comments').select('id', { count: 'exact', head: true }).eq('user_id', user.id).is('deleted_at', null),
+    supabase
+      .from('profiles')
+      .select('nickname, avatar_url, role, belt_level')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('posts')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .is('deleted_at', null),
+    supabase
+      .from('comments')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .is('deleted_at', null),
   ]);
 
   const profile = profileRes.data;
@@ -87,6 +107,8 @@ export default async function DashboardPage() {
       }}
       competitions={competitions}
       notices={notices}
+      news={newsResult.items}
+      newsError={newsResult.isError}
     />
   );
 }

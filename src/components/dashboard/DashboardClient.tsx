@@ -4,10 +4,19 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, MapPin, Trophy, MessageSquare, FileText, Lock } from 'lucide-react';
+import {
+  Search,
+  MapPin,
+  Trophy,
+  MessageSquare,
+  FileText,
+  Lock,
+  Newspaper,
+} from 'lucide-react';
 import { SPORTS } from '@/constants/sports';
 import { formatDate } from '@/utils/formatDate';
 import { buildPostUrl } from '@/lib/slug';
+import type { CategorizedNewsItem } from '@/types/news';
 
 interface Props {
   profile: {
@@ -35,14 +44,27 @@ interface Props {
     created_at: string;
     nickname: string;
   }[];
+  news?: CategorizedNewsItem[];
+  newsError?: boolean;
 }
 
-export default function DashboardClient({ profile, stats, competitions, notices }: Props) {
+export default function DashboardClient({
+  profile,
+  stats,
+  competitions,
+  notices,
+  news = [],
+  newsError = false,
+}: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
   const isGuest = profile === null;
   const isAdmin = profile?.role === 'admin';
   const featured = notices[0] ?? null;
+
+  const hasNews = !newsError && news.length > 0;
+  const featuredNews = hasNews ? news[0] : null;
+  const sideNews = hasNews ? news.slice(1, 4) : [];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,23 +89,37 @@ export default function DashboardClient({ profile, stats, competitions, notices 
   };
 
   return (
-    <div className="w-full min-h-screen" style={{ background: 'var(--color-bg-page)' }}>
+    <div
+      className="w-full min-h-screen"
+      style={{ background: 'var(--color-bg-page)' }}
+    >
       <div className="max-w-[1200px] mx-auto px-5 py-8">
-
         {/* ── Top bar ── */}
         <div className="flex items-center justify-between mb-7 gap-4">
-          <h1 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', whiteSpace: 'nowrap' }}>
+          <h1
+            style={{
+              fontSize: '18px',
+              fontWeight: 700,
+              color: 'var(--color-text-primary)',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {isGuest ? (
               '안녕하세요'
             ) : (
               <>
                 안녕하세요,{' '}
-                <span style={{ color: '#60a5fa' }}>{profile!.nickname}</span>님 🔥
+                <span style={{ color: '#60a5fa' }}>{profile!.nickname}</span>님
+                🔥
               </>
             )}
           </h1>
 
-          <form onSubmit={handleSearch} className="flex items-center" style={{ maxWidth: '280px', width: '100%' }}>
+          <form
+            onSubmit={handleSearch}
+            className="flex items-center"
+            style={{ maxWidth: '280px', width: '100%' }}
+          >
             <div
               className="flex items-center gap-2 w-full h-9"
               style={{
@@ -93,7 +129,10 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                 padding: '0 12px',
               }}
             >
-              <Search size={13} style={{ color: 'var(--color-text-hint)', flexShrink: 0 }} />
+              <Search
+                size={13}
+                style={{ color: 'var(--color-text-hint)', flexShrink: 0 }}
+              />
               <input
                 type="search"
                 value={searchQuery}
@@ -108,38 +147,71 @@ export default function DashboardClient({ profile, stats, competitions, notices 
 
         {/* ── Row 1: Notice + Competitions ── */}
         <div className="grid grid-cols-1 lg:grid-cols-[65%_1fr] gap-5 mb-5">
-
           {/* Notice card (~65%) */}
           <div style={{ minWidth: 0, ...cardStyle }}>
-            {/* Header */}
             <div style={cardHeaderStyle}>
               <div className="flex items-center gap-2">
                 <span style={{ fontSize: '13px' }}>📢</span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>공지</span>
+                <span
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  공지
+                </span>
               </div>
-              <Link href="/community" style={{ fontSize: '11px', color: 'var(--color-text-hint)', textDecoration: 'none' }}>
+              <Link
+                href="/community"
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--color-text-hint)',
+                  textDecoration: 'none',
+                }}
+              >
                 전체보기
               </Link>
             </div>
 
-            {/* Featured notice */}
             {featured ? (
               <Link
                 href={buildPostUrl(featured.title, featured.id)}
                 style={{ display: 'block', textDecoration: 'none' }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = '0.9')}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLElement).style.opacity = '0.9')
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLElement).style.opacity = '1')
+                }
               >
-                {/* Image area */}
-                <div style={{ position: 'relative', height: '220px', background: 'var(--color-bg-surface-alt)', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    position: 'relative',
+                    height: '220px',
+                    background: 'var(--color-bg-surface-alt)',
+                    overflow: 'hidden',
+                  }}
+                >
                   {featured.image_url ? (
-                    <Image src={featured.image_url} alt={featured.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" style={{ opacity: 0.75 }} />
+                    <Image
+                      src={featured.image_url}
+                      alt={featured.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      style={{ opacity: 0.75 }}
+                    />
                   ) : (
                     <div
                       style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(135deg, rgba(37,99,235,0.2) 0%, rgba(139,92,246,0.15) 100%)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        position: 'absolute',
+                        inset: 0,
+                        background:
+                          'linear-gradient(135deg, rgba(37,99,235,0.2) 0%, rgba(139,92,246,0.15) 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}
                     >
                       <span style={{ fontSize: '48px', opacity: 0.4 }}>📢</span>
@@ -147,38 +219,70 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                   )}
                   <div
                     style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(to top, rgba(var(--color-scrim-rgb),0.95) 0%, rgba(var(--color-scrim-rgb),0.3) 50%, transparent 100%)',
+                      position: 'absolute',
+                      inset: 0,
+                      background:
+                        'linear-gradient(to top, rgba(var(--color-scrim-rgb),0.95) 0%, rgba(var(--color-scrim-rgb),0.3) 50%, transparent 100%)',
                     }}
                   />
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px' }}>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: '20px',
+                    }}
+                  >
                     <span
                       style={{
                         display: 'inline-block',
-                        fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em',
-                        color: '#60a5fa', background: 'rgba(37,99,235,0.2)',
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        letterSpacing: '0.1em',
+                        color: '#60a5fa',
+                        background: 'rgba(37,99,235,0.2)',
                         border: '1px solid rgba(37,99,235,0.3)',
-                        padding: '2px 8px', borderRadius: '999px',
+                        padding: '2px 8px',
+                        borderRadius: '999px',
                         marginBottom: '8px',
                       }}
                     >
                       공지
                     </span>
                     <h2
-                      style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', lineHeight: 1.3, letterSpacing: '-0.02em' }}
+                      style={{
+                        fontSize: '18px',
+                        fontWeight: 800,
+                        color: 'var(--color-text-primary)',
+                        lineHeight: 1.3,
+                        letterSpacing: '-0.02em',
+                      }}
                       className="line-clamp-2"
                     >
                       {featured.title}
                     </h2>
-                    <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', marginTop: '6px' }}>
+                    <p
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--color-text-tertiary)',
+                        marginTop: '6px',
+                      }}
+                    >
                       {featured.nickname} · {formatDate(featured.created_at)}
                     </p>
                   </div>
                 </div>
 
-                {/* Body text */}
                 <div style={{ padding: '16px 20px' }}>
-                  <p className="line-clamp-2" style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', lineHeight: 1.65 }}>
+                  <p
+                    className="line-clamp-2"
+                    style={{
+                      fontSize: '13px',
+                      color: 'var(--color-text-tertiary)',
+                      lineHeight: 1.65,
+                    }}
+                  >
                     {featured.content}
                   </p>
                 </div>
@@ -187,8 +291,11 @@ export default function DashboardClient({ profile, stats, competitions, notices 
               <div
                 style={{
                   height: '220px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexDirection: 'column', gap: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column',
+                  gap: '8px',
                   color: 'var(--color-text-disabled)',
                 }}
               >
@@ -203,9 +310,24 @@ export default function DashboardClient({ profile, stats, competitions, notices 
             <div style={cardHeaderStyle}>
               <div className="flex items-center gap-2">
                 <Trophy size={14} style={{ color: '#f59e0b' }} />
-                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>다가오는 대회</span>
+                <span
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  다가오는 대회
+                </span>
               </div>
-              <Link href="/competitions" style={{ fontSize: '11px', color: 'var(--color-text-hint)', textDecoration: 'none' }}>
+              <Link
+                href="/competitions"
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--color-text-hint)',
+                  textDecoration: 'none',
+                }}
+              >
                 전체보기
               </Link>
             </div>
@@ -217,25 +339,49 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                     key={comp.id}
                     style={{
                       padding: '12px 18px',
-                      borderBottom: i < competitions.length - 1 ? '1px solid var(--color-border)' : 'none',
-                      display: 'flex', alignItems: 'center', gap: '12px',
+                      borderBottom:
+                        i < competitions.length - 1
+                          ? '1px solid var(--color-border)'
+                          : 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
                     }}
                   >
                     <div
                       style={{
-                        width: '36px', height: '36px', borderRadius: '8px',
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
                         background: 'rgba(245,158,11,0.12)',
                         border: '1px solid rgba(245,158,11,0.25)',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         flexShrink: 0,
                       }}
                     >
                       {comp.event_data ? (
                         <>
-                          <span style={{ fontSize: '10px', fontWeight: 800, color: '#f59e0b', lineHeight: 1 }}>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 800,
+                              color: '#f59e0b',
+                              lineHeight: 1,
+                            }}
+                          >
                             {new Date(comp.event_data).getMonth() + 1}월
                           </span>
-                          <span style={{ fontSize: '13px', fontWeight: 800, color: '#f59e0b', lineHeight: 1 }}>
+                          <span
+                            style={{
+                              fontSize: '13px',
+                              fontWeight: 800,
+                              color: '#f59e0b',
+                              lineHeight: 1,
+                            }}
+                          >
                             {new Date(comp.event_data).getDate()}
                           </span>
                         </>
@@ -244,11 +390,25 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="line-clamp-1" style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--color-text-high)' }}>
+                      <p
+                        className="line-clamp-1"
+                        style={{
+                          fontSize: '12.5px',
+                          fontWeight: 600,
+                          color: 'var(--color-text-high)',
+                        }}
+                      >
                         {comp.name}
                       </p>
                       {comp.location && (
-                        <p className="line-clamp-1" style={{ fontSize: '11px', color: 'var(--color-text-hint)', marginTop: '2px' }}>
+                        <p
+                          className="line-clamp-1"
+                          style={{
+                            fontSize: '11px',
+                            color: 'var(--color-text-hint)',
+                            marginTop: '2px',
+                          }}
+                        >
                           📍 {comp.location}
                         </p>
                       )}
@@ -257,53 +417,316 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                 ))}
               </div>
             ) : (
-              <div style={{ padding: '40px 24px', textAlign: 'center', color: 'var(--color-text-disabled)', fontSize: '13px' }}>
+              <div
+                style={{
+                  padding: '40px 24px',
+                  textAlign: 'center',
+                  color: 'var(--color-text-disabled)',
+                  fontSize: '13px',
+                }}
+              >
                 예정된 대회가 없습니다
               </div>
             )}
           </div>
         </div>
 
+        {/* ── Row 1.5: 최신 뉴스 ── */}
+        <div style={{ ...cardStyle, marginBottom: '20px' }}>
+          <div style={cardHeaderStyle}>
+            <div className="flex items-center gap-2">
+              <Newspaper size={14} style={{ color: '#60a5fa' }} />
+              <span
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                최신 뉴스
+              </span>
+            </div>
+            <Link
+              href="/news"
+              style={{
+                fontSize: '11px',
+                color: 'var(--color-text-hint)',
+                textDecoration: 'none',
+              }}
+            >
+              전체보기
+            </Link>
+          </div>
+
+          {!hasNews ? (
+            <div
+              style={{
+                padding: '32px 20px',
+                textAlign: 'center',
+                color: 'var(--color-text-disabled)',
+                fontSize: '13px',
+              }}
+            >
+              {newsError
+                ? '최신 뉴스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+                : '표시할 최신 뉴스가 없습니다.'}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12">
+              {featuredNews && (
+                <a
+                  href={featuredNews.originalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lg:col-span-6 flex flex-col justify-between p-5 transition-colors"
+                  style={{
+                    borderBottom: '1px solid var(--color-border)',
+                    textDecoration: 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background =
+                      'var(--color-bg-tint)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background =
+                      'transparent';
+                  }}
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: '#60a5fa',
+                          background: 'rgba(37,99,235,0.16)',
+                          border: '1px solid rgba(37,99,235,0.3)',
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                        }}
+                      >
+                        {featuredNews.category}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          color: 'var(--color-text-tertiary)',
+                        }}
+                      >
+                        {featuredNews.source}
+                      </span>
+                    </div>
+
+                    <h3
+                      className="line-clamp-3"
+                      style={{
+                        fontSize: '17px',
+                        fontWeight: 800,
+                        color: 'var(--color-text-primary)',
+                        lineHeight: 1.4,
+                        letterSpacing: '-0.02em',
+                      }}
+                    >
+                      {featuredNews.title}
+                    </h3>
+                  </div>
+
+                  <div
+                    className="flex items-center justify-between mt-5 pt-3"
+                    style={{
+                      borderTop: '1px solid var(--color-border)',
+                      fontSize: '12px',
+                      color: 'var(--color-text-hint)',
+                    }}
+                  >
+                    <time dateTime={featuredNews.publishedAt}>
+                      {formatDate(featuredNews.publishedAt)}
+                    </time>
+                    <span style={{ color: '#60a5fa', fontWeight: 600 }}>
+                      원문 보기 ↗
+                    </span>
+                  </div>
+                </a>
+              )}
+
+              <div className="lg:col-span-6 flex flex-col justify-between">
+                {sideNews.map((item, idx) => (
+                  <a
+                    key={item.id}
+                    href={item.originalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between gap-3 px-4 py-3.5 transition-colors flex-1"
+                    style={{
+                      borderBottom:
+                        idx < sideNews.length - 1
+                          ? '1px solid var(--color-border)'
+                          : 'none',
+                      textDecoration: 'none',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.background =
+                        'var(--color-bg-tint)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.background =
+                        'transparent';
+                    }}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span
+                        style={{
+                          width: '48px',
+                          textAlign: 'center',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: 'var(--color-text-high)',
+                          background: 'var(--color-bg-tint)',
+                          border: '1px solid var(--color-border)',
+                          padding: '3px 6px',
+                          borderRadius: '6px',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {item.category}
+                      </span>
+                      <div className="min-w-0">
+                        <p
+                          className="truncate"
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            color: 'var(--color-text-high)',
+                          }}
+                        >
+                          {item.title}
+                        </p>
+                        <div
+                          className="flex items-center gap-1.5 mt-0.5"
+                          style={{
+                            fontSize: '11px',
+                            color: 'var(--color-text-hint)',
+                          }}
+                        >
+                          <span>{item.source}</span>
+                          <span>·</span>
+                          <time dateTime={item.publishedAt}>
+                            {formatDate(item.publishedAt)}
+                          </time>
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--color-text-disabled)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      ↗
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* ── Row 2: 도장찾기 | 스포츠커뮤니티 | 마이페이지 (equal 1/3 each) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-
           {/* 도장찾기 */}
           <div style={cardStyle}>
             <div style={cardHeaderStyle}>
               <div className="flex items-center gap-2">
                 <MapPin size={14} style={{ color: '#10b981' }} />
-                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>도장 찾기</span>
+                <span
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  도장 찾기
+                </span>
               </div>
-              <Link href="/dojangs" style={{ fontSize: '11px', color: 'var(--color-text-hint)', textDecoration: 'none' }}>
+              <Link
+                href="/dojangs"
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--color-text-hint)',
+                  textDecoration: 'none',
+                }}
+              >
                 전체보기
               </Link>
             </div>
-            <div style={{ padding: '28px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+            <div
+              style={{
+                padding: '28px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '16px',
+              }}
+            >
               <div
                 style={{
-                  width: '60px', height: '60px', borderRadius: '16px',
-                  background: 'rgba(16,185,129,0.12)', border: '1.5px solid rgba(16,185,129,0.25)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '16px',
+                  background: 'rgba(16,185,129,0.12)',
+                  border: '1.5px solid rgba(16,185,129,0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 <MapPin size={28} style={{ color: '#10b981' }} />
               </div>
               <div style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>내 근처 도장 찾기</p>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', lineHeight: 1.6 }}>
-                  위치 기반으로<br />가까운 도장을 검색해보세요
+                <p
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    color: 'var(--color-text-primary)',
+                    marginBottom: '6px',
+                  }}
+                >
+                  내 근처 도장 찾기
+                </p>
+                <p
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--color-text-tertiary)',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  위치 기반으로
+                  <br />
+                  가까운 도장을 검색해보세요
                 </p>
               </div>
               <Link
                 href="/dojangs"
                 style={{
-                  padding: '9px 24px', borderRadius: '8px',
-                  background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)',
-                  fontSize: '13px', fontWeight: 600, color: '#10b981',
-                  textDecoration: 'none', transition: 'background 0.15s',
+                  padding: '9px 24px',
+                  borderRadius: '8px',
+                  background: 'rgba(16,185,129,0.15)',
+                  border: '1px solid rgba(16,185,129,0.3)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#10b981',
+                  textDecoration: 'none',
+                  transition: 'background 0.15s',
                 }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(16,185,129,0.25)')}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(16,185,129,0.15)')}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLElement).style.background =
+                    'rgba(16,185,129,0.25)')
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLElement).style.background =
+                    'rgba(16,185,129,0.15)')
+                }
               >
                 도장 찾기 →
               </Link>
@@ -313,8 +736,23 @@ export default function DashboardClient({ profile, stats, competitions, notices 
           {/* 스포츠 커뮤니티 */}
           <div style={cardStyle}>
             <div style={cardHeaderStyle}>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>스포츠 커뮤니티</span>
-              <Link href="/community" style={{ fontSize: '11px', color: 'var(--color-text-hint)', textDecoration: 'none' }}>
+              <span
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                스포츠 커뮤니티
+              </span>
+              <Link
+                href="/community"
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--color-text-hint)',
+                  textDecoration: 'none',
+                }}
+              >
                 전체보기
               </Link>
             </div>
@@ -324,29 +762,62 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                   key={slug}
                   href={`/community/sport/${slug}`}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
                     padding: '9px 18px',
                     borderLeft: '3px solid transparent',
-                    textDecoration: 'none', transition: 'background 0.15s',
+                    textDecoration: 'none',
+                    transition: 'background 0.15s',
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = 'var(--color-bg-tint)';
-                    (e.currentTarget as HTMLElement).style.borderLeftColor = color;
+                    (e.currentTarget as HTMLElement).style.background =
+                      'var(--color-bg-tint)';
+                    (e.currentTarget as HTMLElement).style.borderLeftColor =
+                      color;
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = 'transparent';
-                    (e.currentTarget as HTMLElement).style.borderLeftColor = 'transparent';
+                    (e.currentTarget as HTMLElement).style.background =
+                      'transparent';
+                    (e.currentTarget as HTMLElement).style.borderLeftColor =
+                      'transparent';
                   }}
                 >
-                  <div style={{
-                    width: '26px', height: '26px', borderRadius: '50%',
-                    background: color + '1a', border: `1.5px solid ${color}44`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <span style={{ fontSize: iconSize, lineHeight: 1 }}>{icon}</span>
+                  <div
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      background: color + '1a',
+                      border: `1.5px solid ${color}44`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span style={{ fontSize: iconSize, lineHeight: 1 }}>
+                      {icon}
+                    </span>
                   </div>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-high)' }}>{name}</span>
-                  <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--color-text-disabled)' }}>→</span>
+                  <span
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'var(--color-text-high)',
+                    }}
+                  >
+                    {name}
+                  </span>
+                  <span
+                    style={{
+                      marginLeft: 'auto',
+                      fontSize: '11px',
+                      color: 'var(--color-text-disabled)',
+                    }}
+                  >
+                    →
+                  </span>
                 </Link>
               ))}
             </div>
@@ -355,9 +826,24 @@ export default function DashboardClient({ profile, stats, competitions, notices 
           {/* 마이페이지 */}
           <div style={cardStyle}>
             <div style={cardHeaderStyle}>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>내 활동</span>
+              <span
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                내 활동
+              </span>
               {!isGuest && (
-                <Link href="/mypage" style={{ fontSize: '11px', color: 'var(--color-text-hint)', textDecoration: 'none' }}>
+                <Link
+                  href="/mypage"
+                  style={{
+                    fontSize: '11px',
+                    color: 'var(--color-text-hint)',
+                    textDecoration: 'none',
+                  }}
+                >
                   마이페이지 →
                 </Link>
               )}
@@ -367,68 +853,139 @@ export default function DashboardClient({ profile, stats, competitions, notices 
               <div
                 style={{
                   padding: '36px 20px',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '14px',
                 }}
               >
                 <div
                   style={{
-                    width: '52px', height: '52px', borderRadius: '50%',
-                    background: 'var(--color-bg-tint)', border: '1.5px solid var(--color-border-medium)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: '52px',
+                    height: '52px',
+                    borderRadius: '50%',
+                    background: 'var(--color-bg-tint)',
+                    border: '1.5px solid var(--color-border-medium)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
                   <Lock size={22} style={{ color: 'var(--color-text-hint)' }} />
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', textAlign: 'center', lineHeight: 1.6 }}>
-                  로그인하면 내 활동을<br />확인할 수 있습니다
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: 'var(--color-text-tertiary)',
+                    textAlign: 'center',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  로그인하면 내 활동을
+                  <br />
+                  확인할 수 있습니다
                 </p>
                 <Link
                   href="/login"
                   style={{
-                    padding: '9px 24px', borderRadius: '8px',
-                    background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)',
-                    fontSize: '13px', fontWeight: 600, color: '#60a5fa',
-                    textDecoration: 'none', transition: 'background 0.15s',
+                    padding: '9px 24px',
+                    borderRadius: '8px',
+                    background: 'rgba(37,99,235,0.15)',
+                    border: '1px solid rgba(37,99,235,0.3)',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: '#60a5fa',
+                    textDecoration: 'none',
+                    transition: 'background 0.15s',
                   }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(37,99,235,0.25)')}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(37,99,235,0.15)')}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      'rgba(37,99,235,0.25)')
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      'rgba(37,99,235,0.15)')
+                  }
                 >
                   로그인
                 </Link>
               </div>
             ) : (
-              <div style={{ padding: '20px 18px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {/* Profile row */}
+              <div
+                style={{
+                  padding: '20px 18px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px',
+                }}
+              >
                 <div className="flex items-center gap-3">
                   <div
                     style={{
-                      width: '44px', height: '44px', borderRadius: '50%',
-                      background: 'rgba(37,99,235,0.2)', border: '2px solid rgba(37,99,235,0.35)',
-                      overflow: 'hidden', flexShrink: 0, position: 'relative',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '50%',
+                      background: 'rgba(37,99,235,0.2)',
+                      border: '2px solid rgba(37,99,235,0.35)',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
                     {profile!.avatar_url ? (
-                      <Image src={profile!.avatar_url} alt={profile!.nickname} fill sizes="44px" className="object-cover" />
+                      <Image
+                        src={profile!.avatar_url}
+                        alt={profile!.nickname}
+                        fill
+                        sizes="44px"
+                        className="object-cover"
+                      />
                     ) : (
-                      <span style={{ fontSize: '18px', fontWeight: 800, color: '#60a5fa' }}>
+                      <span
+                        style={{
+                          fontSize: '18px',
+                          fontWeight: 800,
+                          color: '#60a5fa',
+                        }}
+                      >
                         {profile!.nickname[0]?.toUpperCase()}
                       </span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{profile!.nickname}</p>
+                    <p
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        color: 'var(--color-text-primary)',
+                      }}
+                    >
+                      {profile!.nickname}
+                    </p>
                     {profile!.belt_level && (
-                      <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>{profile!.belt_level}</p>
+                      <p
+                        style={{
+                          fontSize: '11px',
+                          color: 'var(--color-text-tertiary)',
+                        }}
+                      >
+                        {profile!.belt_level}
+                      </p>
                     )}
                   </div>
                   {isAdmin && (
                     <span
                       style={{
-                        fontSize: '10px', fontWeight: 700,
-                        color: '#f59e0b', background: 'rgba(245,158,11,0.15)',
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        color: '#f59e0b',
+                        background: 'rgba(245,158,11,0.15)',
                         border: '1px solid rgba(245,158,11,0.3)',
-                        padding: '2px 7px', borderRadius: '999px',
+                        padding: '2px 7px',
+                        borderRadius: '999px',
                         flexShrink: 0,
                       }}
                     >
@@ -437,11 +994,12 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                   )}
                 </div>
 
-                {/* Stats */}
                 <div className="flex gap-3">
                   <div
                     style={{
-                      flex: 1, padding: '12px', borderRadius: '10px',
+                      flex: 1,
+                      padding: '12px',
+                      borderRadius: '10px',
                       background: 'var(--color-bg-tint)',
                       border: '1px solid var(--color-border)',
                       textAlign: 'center',
@@ -449,13 +1007,31 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                   >
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <FileText size={12} style={{ color: '#60a5fa' }} />
-                      <span style={{ fontSize: '10px', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>게시글</span>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          color: 'var(--color-text-tertiary)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        게시글
+                      </span>
                     </div>
-                    <p style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{stats!.postCount}</p>
+                    <p
+                      style={{
+                        fontSize: '22px',
+                        fontWeight: 800,
+                        color: 'var(--color-text-primary)',
+                      }}
+                    >
+                      {stats!.postCount}
+                    </p>
                   </div>
                   <div
                     style={{
-                      flex: 1, padding: '12px', borderRadius: '10px',
+                      flex: 1,
+                      padding: '12px',
+                      borderRadius: '10px',
                       background: 'var(--color-bg-tint)',
                       border: '1px solid var(--color-border)',
                       textAlign: 'center',
@@ -463,25 +1039,51 @@ export default function DashboardClient({ profile, stats, competitions, notices 
                   >
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <MessageSquare size={12} style={{ color: '#8b5cf6' }} />
-                      <span style={{ fontSize: '10px', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>댓글</span>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          color: 'var(--color-text-tertiary)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        댓글
+                      </span>
                     </div>
-                    <p style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{stats!.commentCount}</p>
+                    <p
+                      style={{
+                        fontSize: '22px',
+                        fontWeight: 800,
+                        color: 'var(--color-text-primary)',
+                      }}
+                    >
+                      {stats!.commentCount}
+                    </p>
                   </div>
                 </div>
 
-                {/* Mypage link */}
                 <Link
                   href="/mypage"
                   style={{
-                    display: 'block', padding: '9px',
+                    display: 'block',
+                    padding: '9px',
                     background: 'var(--color-bg-tint)',
                     border: '1px solid var(--color-border-medium)',
-                    borderRadius: '8px', textAlign: 'center',
-                    fontSize: '12.5px', fontWeight: 600, color: 'var(--color-text-secondary)',
-                    textDecoration: 'none', transition: 'background 0.15s',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    color: 'var(--color-text-secondary)',
+                    textDecoration: 'none',
+                    transition: 'background 0.15s',
                   }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'var(--color-border-medium)')}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'var(--color-bg-tint)')}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      'var(--color-border-medium)')
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      'var(--color-bg-tint)')
+                  }
                 >
                   마이페이지 →
                 </Link>
@@ -489,7 +1091,6 @@ export default function DashboardClient({ profile, stats, competitions, notices 
             )}
           </div>
         </div>
-
       </div>
     </div>
   );
