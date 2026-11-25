@@ -3,8 +3,19 @@ import {
   SPORTS_NEWS_CATEGORIES,
   type CategorizedNewsItem,
   type NewsFetchResult,
+  type SportNewsCategory,
   type SportsNewsFetchResult,
 } from '@/types/news';
+
+// UI 표시용 카테고리명과 실제 네이버 뉴스 검색 쿼리 분리
+const CATEGORY_QUERY_MAP: Record<SportNewsCategory, string> = {
+  유도: '유도',
+  주짓수: '주짓수',
+  레슬링: '레슬링',
+  복싱: '복싱',
+  태권도: '태권도',
+  MMA: '종합격투기',
+};
 
 export async function fetchAllSportsNews(options?: {
   perCategoryDisplay?: number;
@@ -14,7 +25,7 @@ export async function fetchAllSportsNews(options?: {
   const settled = await Promise.allSettled(
     SPORTS_NEWS_CATEGORIES.map(async (category) => {
       const result: NewsFetchResult = await fetchNaverNews({
-        query: category,
+        query: CATEGORY_QUERY_MAP[category],
         display,
         sort: 'date',
       });
