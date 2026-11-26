@@ -19,9 +19,17 @@ interface CommunityClientProps {
   initialPosts: Post[];
 }
 
-export default function CommunityClient({ initialPosts }: CommunityClientProps) {
-  const { searchQuery, setSearchQuery, debouncedSearch, hoveredSlug, setHoveredSlug, isScrollRestoredRef } =
-    useCommunityListState();
+export default function CommunityClient({
+  initialPosts,
+}: CommunityClientProps) {
+  const {
+    searchQuery,
+    setSearchQuery,
+    debouncedSearch,
+    hoveredSlug,
+    setHoveredSlug,
+    isScrollRestoredRef,
+  } = useCommunityListState();
   const { user, loading } = useAuth();
   const isAdmin = user?.role === 'admin';
 
@@ -71,7 +79,9 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
 
   useEffect(() => {
     if (drawerOpen && drawerRef.current) {
-      const first = drawerRef.current.querySelector<HTMLElement>('a[href], button:not([disabled])');
+      const first = drawerRef.current.querySelector<HTMLElement>(
+        'a[href], button:not([disabled])',
+      );
       first?.focus();
     }
   }, [drawerOpen]);
@@ -79,18 +89,29 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!drawerOpen) return;
-      if (e.key === 'Escape') { closeDrawer(); return; }
+      if (e.key === 'Escape') {
+        closeDrawer();
+        return;
+      }
       if (e.key !== 'Tab' || !drawerRef.current) return;
       const focusable = Array.from(
-        drawerRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+        drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled])',
+        ),
       );
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
       } else {
-        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -98,8 +119,11 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
   }, [drawerOpen, closeDrawer]);
 
   return (
-    <section className="w-full min-h-screen" style={{ background: 'var(--color-bg-page)' }} aria-label="커뮤니티 공지 목록">
-
+    <section
+      className="w-full min-h-screen"
+      style={{ background: 'var(--color-bg-page)' }}
+      aria-label="커뮤니티 공지 목록"
+    >
       {/* ── Hero ── */}
       <div className="relative h-[320px] overflow-hidden flex items-end">
         <Image
@@ -107,24 +131,51 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
           src="/images/bjj-2.webp"
           alt=""
           aria-hidden="true"
-          style={{ objectFit: 'cover', opacity: 0.38, filter: 'grayscale(10%)' }}
+          style={{
+            objectFit: 'cover',
+            opacity: 0.38,
+            filter: 'grayscale(10%)',
+          }}
           priority
           sizes="100vw"
         />
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(to top, rgba(var(--color-scrim-rgb),0.96) 0%, rgba(var(--color-scrim-rgb),0.45) 60%, rgba(var(--color-scrim-rgb),0.2) 100%)' }}
+          style={{
+            background:
+              'linear-gradient(to top, rgba(var(--color-scrim-rgb),0.96) 0%, rgba(var(--color-scrim-rgb),0.45) 60%, rgba(var(--color-scrim-rgb),0.2) 100%)',
+          }}
         />
-        <div className="relative z-10 px-6 pb-5">
-          <h1 className="font-extrabold text-text-primary text-[38px] leading-none tracking-[-0.04em]">
+        <div className="relative z-10 px-6 pb-6 md:px-12 md:pb-8">
+          <p
+            style={{
+              fontSize: '10.5px',
+              fontWeight: 600,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '10px',
+            }}
+          >
+            COMMUNITY
+          </p>
+          <h1 className="font-extrabold text-text-primary text-[38px] md:text-[52px] leading-none tracking-[-0.04em]">
             공지
           </h1>
+          <p
+            style={{
+              fontSize: '13px',
+              color: 'var(--color-text-secondary)',
+              marginTop: '10px',
+            }}
+          >
+            ACTIVIO 주요 공지사항과 종목별 커뮤니티 소식을 확인하세요.
+          </p>
         </div>
       </div>
 
       {/* ── 3-column layout ── */}
       <div className="max-w-[1200px] mx-auto px-4 py-6 flex gap-5 items-start">
-
         {/* ── Left sidebar: Promo Ad ── */}
         <aside
           className="hidden lg:flex flex-col shrink-0"
@@ -143,7 +194,6 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
 
         {/* ── Center: search/write + posts ── */}
         <section className="flex-1 min-w-0">
-
           {/* Search + write */}
           <div
             className="flex items-center gap-3 mb-4"
@@ -163,7 +213,10 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
               onClick={() => setDrawerOpen(true)}
               aria-expanded={drawerOpen}
               aria-label="사이드바 열기"
-              style={{ background: 'var(--color-bg-tint)', border: '1px solid var(--color-border-medium)' }}
+              style={{
+                background: 'var(--color-bg-tint)',
+                border: '1px solid var(--color-border-medium)',
+              }}
             >
               <Menu size={16} aria-hidden="true" />
             </button>
@@ -177,7 +230,11 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
                 padding: '0 16px',
               }}
             >
-              <Search size={14} style={{ opacity: 0.4, flexShrink: 0 }} aria-hidden="true" />
+              <Search
+                size={14}
+                style={{ opacity: 0.4, flexShrink: 0 }}
+                aria-hidden="true"
+              />
               <input
                 type="search"
                 value={searchQuery}
@@ -194,8 +251,14 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
                 href="/community/write"
                 className="shrink-0 h-10 flex items-center rounded-full text-white text-[13px] font-semibold whitespace-nowrap transition-colors"
                 style={{ background: '#2563eb', padding: '0 20px' }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = '#1d4ed8')}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = '#2563eb')}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLElement).style.background =
+                    '#1d4ed8')
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLElement).style.background =
+                    '#2563eb')
+                }
               >
                 글쓰기
               </Link>
@@ -255,12 +318,22 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
           )}
 
           {hasNextPage && (
-            <div ref={observerRef} className="h-16 flex items-center justify-center">
-              <div role="status" aria-live="polite" aria-label={isFetchingNextPage ? '더 불러오는 중' : ''}>
+            <div
+              ref={observerRef}
+              className="h-16 flex items-center justify-center"
+            >
+              <div
+                role="status"
+                aria-live="polite"
+                aria-label={isFetchingNextPage ? '더 불러오는 중' : ''}
+              >
                 {isFetchingNextPage && (
                   <div
                     className="w-6 h-6 border-2 rounded-full animate-spin"
-                    style={{ borderColor: '#2563eb', borderTopColor: 'transparent' }}
+                    style={{
+                      borderColor: '#2563eb',
+                      borderTopColor: 'transparent',
+                    }}
                     aria-hidden="true"
                   />
                 )}
@@ -308,16 +381,39 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
             >
               <div
                 style={{
-                  width: '34px', height: '34px', borderRadius: '50%',
-                  background: 'rgba(37,99,235,0.15)', border: '1.5px solid rgba(37,99,235,0.4)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '17px', flexShrink: 0,
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '50%',
+                  background: 'rgba(37,99,235,0.15)',
+                  border: '1.5px solid rgba(37,99,235,0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '17px',
+                  flexShrink: 0,
                 }}
               >
                 📢
               </div>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>공지</span>
-              <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#2563eb', marginLeft: 'auto', flexShrink: 0 }} />
+              <span
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                공지
+              </span>
+              <div
+                style={{
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '50%',
+                  background: '#2563eb',
+                  marginLeft: 'auto',
+                  flexShrink: 0,
+                }}
+              />
             </div>
 
             {SPORTS.map(({ slug, name, icon, iconSize, color }) => (
@@ -329,7 +425,10 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
                   alignItems: 'center',
                   gap: '12px',
                   padding: '10px 16px',
-                  background: hoveredSlug === slug ? 'var(--color-bg-tint)' : 'transparent',
+                  background:
+                    hoveredSlug === slug
+                      ? 'var(--color-bg-tint)'
+                      : 'transparent',
                   borderLeft: `3px solid ${hoveredSlug === slug ? color : 'transparent'}`,
                   textDecoration: 'none',
                   transition: 'background 0.15s',
@@ -339,15 +438,27 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
               >
                 <div
                   style={{
-                    width: '34px', height: '34px', borderRadius: '50%',
-                    background: color + '33', border: `1.5px solid ${color}66`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: iconSize, flexShrink: 0,
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    background: color + '33',
+                    border: `1.5px solid ${color}66`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: iconSize,
+                    flexShrink: 0,
                   }}
                 >
                   {icon}
                 </div>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-high)' }}>
+                <span
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: 'var(--color-text-high)',
+                  }}
+                >
                   {name}
                 </span>
               </Link>
@@ -394,13 +505,27 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
                 background: 'var(--color-bg-surface)',
               }}
             >
-              <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+              <span
+                style={{
+                  fontSize: '13.5px',
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
                 커뮤니티 메뉴
               </span>
               <button
                 onClick={closeDrawer}
                 aria-label="메뉴 닫기"
-                style={{ padding: '6px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center' }}
+                style={{
+                  padding: '6px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-tertiary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
               >
                 <X size={18} aria-hidden="true" />
               </button>
@@ -425,20 +550,47 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
                 {/* 공지 — 현재 활성 */}
                 <div
                   className="flex items-center gap-3"
-                  style={{ padding: '10px 16px', background: 'var(--color-btn-basic)', borderLeft: '3px solid #2563eb' }}
+                  style={{
+                    padding: '10px 16px',
+                    background: 'var(--color-btn-basic)',
+                    borderLeft: '3px solid #2563eb',
+                  }}
                 >
                   <div
                     style={{
-                      width: '34px', height: '34px', borderRadius: '50%',
-                      background: 'rgba(37,99,235,0.15)', border: '1.5px solid rgba(37,99,235,0.4)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '17px', flexShrink: 0,
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      background: 'rgba(37,99,235,0.15)',
+                      border: '1.5px solid rgba(37,99,235,0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '17px',
+                      flexShrink: 0,
                     }}
                   >
                     📢
                   </div>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>공지</span>
-                  <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#2563eb', marginLeft: 'auto', flexShrink: 0 }} />
+                  <span
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: 'var(--color-text-primary)',
+                    }}
+                  >
+                    공지
+                  </span>
+                  <div
+                    style={{
+                      width: '7px',
+                      height: '7px',
+                      borderRadius: '50%',
+                      background: '#2563eb',
+                      marginLeft: 'auto',
+                      flexShrink: 0,
+                    }}
+                  />
                 </div>
                 {SPORTS.map(({ slug, name, icon, iconSize, color }) => (
                   <Link
@@ -446,9 +598,13 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
                     href={`/community/sport/${slug}`}
                     onClick={closeDrawer}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: '12px',
-                      padding: '10px 16px', textDecoration: 'none',
-                      transition: 'background 0.15s', borderLeft: '3px solid transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '10px 16px',
+                      textDecoration: 'none',
+                      transition: 'background 0.15s',
+                      borderLeft: '3px solid transparent',
                     }}
                     onMouseEnter={(e) => {
                       const el = e.currentTarget as HTMLElement;
@@ -463,20 +619,33 @@ export default function CommunityClient({ initialPosts }: CommunityClientProps) 
                   >
                     <div
                       style={{
-                        width: '34px', height: '34px', borderRadius: '50%',
-                        background: color + '33', border: `1.5px solid ${color}66`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '17px', flexShrink: 0,
+                        width: '34px',
+                        height: '34px',
+                        borderRadius: '50%',
+                        background: color + '33',
+                        border: `1.5px solid ${color}66`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '17px',
+                        flexShrink: 0,
                       }}
                     >
                       {icon}
                     </div>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-high)' }}>{name}</span>
+                    <span
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: 'var(--color-text-high)',
+                      }}
+                    >
+                      {name}
+                    </span>
                   </Link>
                 ))}
               </div>
             </div>
-
           </div>
 
           {/* Backdrop */}
