@@ -21,6 +21,7 @@ interface SportCommunityClientProps {
     slug: string;
     name: string;
     icon: string;
+    iconSize?: string | number;
     hero: string;
     heroPos: string;
     color: string;
@@ -172,7 +173,7 @@ export default function SportCommunityClient({
               style={{
                 background: `${sport.color}33`,
                 border: `1.5px solid ${sport.color}66`,
-                fontSize: sport.iconSize,
+                fontSize: sport.iconSize ?? '20px',
               }}
             >
               {sport.icon}
