@@ -1,3 +1,4 @@
+import { cacheLife, cacheTag } from 'next/cache';
 import { fetchNaverNews } from '@/services/news/fetchNaverNews';
 import {
   SPORTS_NEWS_CATEGORIES,
@@ -17,10 +18,12 @@ const CATEGORY_QUERY_MAP: Record<SportNewsCategory, string> = {
   MMA: '종합격투기',
 };
 
-export async function fetchAllSportsNews(options?: {
-  perCategoryDisplay?: number;
-}): Promise<SportsNewsFetchResult> {
-  const display = options?.perCategoryDisplay ?? 5;
+async function getCachedSportsNews(
+  display: number,
+): Promise<SportsNewsFetchResult> {
+  'use cache';
+  cacheTag('sports-news');
+  cacheLife('minutes');
 
   const settled = await Promise.allSettled(
     SPORTS_NEWS_CATEGORIES.map(async (category) => {
@@ -66,4 +69,14 @@ export async function fetchAllSportsNews(options?: {
     items: merged,
     isError: isAllFailed && merged.length === 0,
   };
+}
+
+export async function fetchAllSportsNews(options?: {
+  perCategoryDisplay?: number;
+}): Promise<SportsNewsFetchResult> {
+  const display = options?.perCategoryDisplay ?? 5;
+  const result = await getCachedSportsNews(display);
+
+  // 전체 조회가 실패한 경우에는 캐시된 빈 에러 상태를 그대로 두지 않고 재시도할 수 있게 반환
+  return result;
 }
