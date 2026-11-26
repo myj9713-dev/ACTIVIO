@@ -32,7 +32,20 @@ interface CompetitionClientProps {
 
 const TABS = ['전체', '모집중', '마감임박', '모집완료'] as const;
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
-const MONTH_KR = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const MONTH_KR = [
+  '1월',
+  '2월',
+  '3월',
+  '4월',
+  '5월',
+  '6월',
+  '7월',
+  '8월',
+  '9월',
+  '10월',
+  '11월',
+  '12월',
+];
 
 interface MiniCalendarProps {
   eventDates: Set<string>;
@@ -41,7 +54,11 @@ interface MiniCalendarProps {
   onDateSelect: (date: string | null) => void;
 }
 
-function MiniCalendar({ eventDates, selectedDate, onDateSelect }: MiniCalendarProps) {
+function MiniCalendar({
+  eventDates,
+  selectedDate,
+  onDateSelect,
+}: MiniCalendarProps) {
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -86,26 +103,60 @@ function MiniCalendar({ eventDates, selectedDate, onDateSelect }: MiniCalendarPr
       {/* inner core */}
       <div>
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-0.01em' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '14px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '13px',
+              fontWeight: 700,
+              color: 'var(--color-text-primary)',
+              letterSpacing: '-0.01em',
+            }}
+          >
             {viewYear} {MONTH_KR[viewMonth]}
           </span>
           <div style={{ display: 'flex', gap: '4px' }}>
             {[
-              { icon: ChevronLeft, action: () => { if (viewMonth === 0) { setViewMonth(11); setViewYear((y) => y - 1); } else setViewMonth((m) => m - 1); } },
-              { icon: ChevronRight, action: () => { if (viewMonth === 11) { setViewMonth(0); setViewYear((y) => y + 1); } else setViewMonth((m) => m + 1); } },
+              {
+                icon: ChevronLeft,
+                action: () => {
+                  if (viewMonth === 0) {
+                    setViewMonth(11);
+                    setViewYear((y) => y - 1);
+                  } else setViewMonth((m) => m - 1);
+                },
+              },
+              {
+                icon: ChevronRight,
+                action: () => {
+                  if (viewMonth === 11) {
+                    setViewMonth(0);
+                    setViewYear((y) => y + 1);
+                  } else setViewMonth((m) => m + 1);
+                },
+              },
             ].map(({ icon: Icon, action }, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={action}
                 style={{
-                  width: '24px', height: '24px',
+                  width: '24px',
+                  height: '24px',
                   background: 'var(--color-bg-tint)',
                   border: '1px solid var(--color-border)',
                   borderRadius: '7px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: 'var(--color-text-hint)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-hint)',
                   transition: 'all 0.2s',
                 }}
               >
@@ -116,16 +167,38 @@ function MiniCalendar({ eventDates, selectedDate, onDateSelect }: MiniCalendarPr
         </div>
 
         {/* Weekday labels */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '2px', marginBottom: '4px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(7,1fr)',
+            gap: '2px',
+            marginBottom: '4px',
+          }}
+        >
           {WEEKDAYS.map((w) => (
-            <div key={w} style={{ fontSize: '9px', fontWeight: 600, color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '3px 0' }}>
+            <div
+              key={w}
+              style={{
+                fontSize: '9px',
+                fontWeight: 600,
+                color: 'var(--color-text-tertiary)',
+                textAlign: 'center',
+                padding: '3px 0',
+              }}
+            >
               {w}
             </div>
           ))}
         </div>
 
         {/* Day cells */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '2px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(7,1fr)',
+            gap: '2px',
+          }}
+        >
           {cells.map((day, i) => {
             if (!day) return <div key={i} />;
             const today_ = isToday(day);
@@ -142,8 +215,16 @@ function MiniCalendar({ eventDates, selectedDate, onDateSelect }: MiniCalendarPr
                   textAlign: 'center',
                   padding: highlighted ? '0' : '5px 2px',
                   borderRadius: highlighted ? '50%' : '7px',
-                  color: sel ? '#fff' : today_ ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-                  background: sel ? '#2563eb' : today_ ? 'var(--color-border-medium)' : 'transparent',
+                  color: sel
+                    ? '#fff'
+                    : today_
+                      ? 'var(--color-text-primary)'
+                      : 'var(--color-text-secondary)',
+                  background: sel
+                    ? '#2563eb'
+                    : today_
+                      ? 'var(--color-border-medium)'
+                      : 'transparent',
                   width: highlighted ? '24px' : undefined,
                   height: highlighted ? '24px' : undefined,
                   display: 'flex',
@@ -167,7 +248,8 @@ function MiniCalendar({ eventDates, selectedDate, onDateSelect }: MiniCalendarPr
                       bottom: '1px',
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      width: '3px', height: '3px',
+                      width: '3px',
+                      height: '3px',
                       background: '#3b82f6',
                       borderRadius: '50%',
                     }}
@@ -182,7 +264,9 @@ function MiniCalendar({ eventDates, selectedDate, onDateSelect }: MiniCalendarPr
   );
 }
 
-export default function CompetitionClient({ initialCompetitions }: CompetitionClientProps) {
+export default function CompetitionClient({
+  initialCompetitions,
+}: CompetitionClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get('tab') ?? '전체';
@@ -211,8 +295,11 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
     () =>
       competitions
         .filter((c) => {
-          const matchTab = activeTab === '전체' || getStatus(c.apply_deadline) === activeTab;
-          const matchSearch = c.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+          const matchTab =
+            activeTab === '전체' || getStatus(c.apply_deadline) === activeTab;
+          const matchSearch = c.name
+            .toLowerCase()
+            .includes(debouncedSearch.toLowerCase());
           return matchTab && matchSearch;
         })
         .sort((a, b) => {
@@ -220,7 +307,10 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
           const sB = getStatus(b.apply_deadline);
           if (sA === '모집완료' && sB !== '모집완료') return 1;
           if (sA !== '모집완료' && sB === '모집완료') return -1;
-          return new Date(a.apply_deadline).getTime() - new Date(b.apply_deadline).getTime();
+          return (
+            new Date(a.apply_deadline).getTime() -
+            new Date(b.apply_deadline).getTime()
+          );
         }),
     [competitions, activeTab, debouncedSearch],
   );
@@ -241,61 +331,71 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
   return (
     <div style={{ background: 'var(--color-bg-page)', minHeight: '100vh' }}>
       {/* ── Hero ── */}
-      <div
-        style={{
-          position: 'relative',
-          height: 'clamp(200px, 30vw, 300px)',
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'flex-end',
-        }}
-      >
+      <div className="relative h-[320px] overflow-hidden flex items-end">
         <Image
           fill
           src="/images/bjj-2.webp"
           alt=""
           aria-hidden="true"
-          style={{ objectFit: 'cover', opacity: 0.38, filter: 'grayscale(10%)' }}
+          style={{
+            objectFit: 'cover',
+            opacity: 0.38,
+            filter: 'grayscale(10%)',
+          }}
           priority
           sizes="100vw"
         />
         <div
+          className="absolute inset-0"
           style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to top, rgba(var(--color-scrim-rgb),0.95) 0%, rgba(var(--color-scrim-rgb),0.4) 60%, rgba(var(--color-scrim-rgb),0.2) 100%)',
+            background:
+              'linear-gradient(to top, rgba(var(--color-scrim-rgb),0.96) 0%, rgba(var(--color-scrim-rgb),0.45) 60%, rgba(var(--color-scrim-rgb),0.2) 100%)',
           }}
         />
         {/* Watermark */}
         <div
           style={{
-            position: 'absolute', bottom: '-10px', right: '-8px',
-            fontSize: '100px', fontWeight: 800, lineHeight: 1,
-            color: 'rgba(255,255,255,0.055)', letterSpacing: '-0.03em',
-            userSelect: 'none', pointerEvents: 'none',
+            position: 'absolute',
+            bottom: '-10px',
+            right: '-8px',
+            fontSize: '100px',
+            fontWeight: 800,
+            lineHeight: 1,
+            color: 'rgba(255,255,255,0.055)',
+            letterSpacing: '-0.03em',
+            userSelect: 'none',
+            pointerEvents: 'none',
           }}
           aria-hidden="true"
         >
           COMPETITION
         </div>
 
-        <div className="relative z-[2] px-4 pb-8 md:px-12 md:pb-10">
+        <div className="relative z-10 px-6 pb-6 md:px-12 md:pb-8">
           <p
             style={{
-              fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.18em',
-              textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '14px',
+              fontSize: '10.5px',
+              fontWeight: 600,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '10px',
             }}
           >
             COMPETITION
           </p>
-          <h1
-            className="text-[44px] md:text-[68px]"
-            style={{
-              fontWeight: 800, color: 'var(--color-text-primary)',
-              lineHeight: 0.92, letterSpacing: '-0.04em',
-            }}
-          >
+          <h1 className="font-extrabold text-text-primary text-[38px] md:text-[52px] leading-none tracking-[-0.04em]">
             대회 일정
           </h1>
+          <p
+            style={{
+              fontSize: '13px',
+              color: 'var(--color-text-secondary)',
+              marginTop: '10px',
+            }}
+          >
+            주요 격투 종목 대회 일정과 접수 마감일을 확인하세요.
+          </p>
         </div>
       </div>
 
@@ -326,12 +426,16 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
                 marginBottom: '-1px',
                 fontSize: '13.5px',
                 fontWeight: activeTab === tab ? 600 : 500,
-                color: activeTab === tab ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                color:
+                  activeTab === tab
+                    ? 'var(--color-text-primary)'
+                    : 'var(--color-text-secondary)',
                 background: 'none',
                 border: 'none',
                 borderBottomStyle: 'solid',
                 borderBottomWidth: '2px',
-                borderBottomColor: activeTab === tab ? '#2563eb' : 'transparent',
+                borderBottomColor:
+                  activeTab === tab ? '#2563eb' : 'transparent',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
                 whiteSpace: 'nowrap',
@@ -366,8 +470,12 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
               aria-label="대회 검색"
               className="flex-1 min-w-0"
               style={{
-                background: 'none', border: 'none', outline: 'none',
-                fontFamily: 'inherit', fontSize: '13px', color: 'var(--color-text-primary)',
+                background: 'none',
+                border: 'none',
+                outline: 'none',
+                fontFamily: 'inherit',
+                fontSize: '13px',
+                color: 'var(--color-text-primary)',
               }}
             />
           </div>
@@ -376,10 +484,18 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
               href="/competitions/write"
               className="shrink-0"
               style={{
-                padding: '8px 18px', background: '#2563eb', color: '#fff',
-                border: 'none', borderRadius: '5px', fontFamily: 'inherit',
-                fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-                textDecoration: 'none', display: 'inline-block',
+                padding: '8px 18px',
+                background: '#2563eb',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                fontFamily: 'inherit',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textDecoration: 'none',
+                display: 'inline-block',
               }}
             >
               일정 추가
@@ -403,11 +519,26 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
         {/* Competition list */}
         <section aria-label="대회일정 목록">
           {isLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '80px 0',
+              }}
+            >
               <LoadingSpinner label="대회 목록 불러오는 중" />
             </div>
           ) : filteredCompetitions.length > 0 ? (
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
               {filteredCompetitions.map((competition, index) => (
                 <li key={competition.id}>
                   <CompetitionCard competition={competition} index={index} />
@@ -417,9 +548,13 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
           ) : (
             <div
               style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                justifyContent: 'center', padding: '80px 0',
-                color: 'var(--color-text-secondary)', fontSize: '15px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '80px 0',
+                color: 'var(--color-text-secondary)',
+                fontSize: '15px',
               }}
               aria-live="polite"
             >
@@ -428,12 +563,21 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
           )}
 
           {hasNextPage && (
-            <div ref={observerRef} style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div
+              ref={observerRef}
+              style={{
+                height: '80px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <div role="status" aria-live="polite">
                 {isFetchingNextPage && (
                   <div
                     style={{
-                      width: '24px', height: '24px',
+                      width: '24px',
+                      height: '24px',
                       border: '2px solid rgba(37,99,235,0.3)',
                       borderTopColor: '#2563eb',
                       borderRadius: '50%',
@@ -447,7 +591,10 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
         </section>
 
         {/* Right: calendar sidebar (lg+에서만 표시) */}
-        <aside className="hidden lg:flex" style={{ flexDirection: 'column', gap: '14px' }}>
+        <aside
+          className="hidden lg:flex"
+          style={{ flexDirection: 'column', gap: '14px' }}
+        >
           <MiniCalendar
             eventDates={eventDates}
             selectedDate={selectedDate}
@@ -467,8 +614,11 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
               <div>
                 <p
                   style={{
-                    fontSize: '9px', fontWeight: 700, color: 'var(--color-text-secondary)',
-                    letterSpacing: '0.12em', textTransform: 'uppercase',
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    color: 'var(--color-text-secondary)',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
                     marginBottom: '10px',
                   }}
                 >
@@ -477,61 +627,104 @@ export default function CompetitionClient({ initialCompetitions }: CompetitionCl
                     : '이번 달 대회'}
                 </p>
                 {(selectedDate
-                  ? competitions.filter((c) =>
-                      c.event_data?.slice(0, 10) === selectedDate ||
-                      c.apply_deadline?.slice(0, 10) === selectedDate
+                  ? competitions.filter(
+                      (c) =>
+                        c.event_data?.slice(0, 10) === selectedDate ||
+                        c.apply_deadline?.slice(0, 10) === selectedDate,
                     )
                   : filteredCompetitions
                 ).slice(0, 4).length === 0 ? (
-                  <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', textAlign: 'center', padding: '8px 0' }}>
-                    해당 날짜의 대회가 없습니다
-                  </p>
-                ) : (selectedDate
-                  ? competitions.filter((c) =>
-                      c.event_data?.slice(0, 10) === selectedDate ||
-                      c.apply_deadline?.slice(0, 10) === selectedDate
-                    )
-                  : filteredCompetitions
-                ).slice(0, 4).map((c) => (
-                  <div
-                    key={c.id}
+                  <p
                     style={{
-                      display: 'flex', alignItems: 'center', gap: '10px',
-                      padding: '7px 0',
-                      borderBottom: '1px solid var(--color-bg-tint)',
+                      fontSize: '11px',
+                      color: 'var(--color-text-secondary)',
+                      textAlign: 'center',
+                      padding: '8px 0',
                     }}
                   >
-                    <div
-                      style={{
-                        width: '34px', height: '34px',
-                        background: 'rgba(37,99,235,0.12)',
-                        border: '1px solid rgba(37,99,235,0.2)',
-                        borderRadius: '8px',
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <span style={{ fontSize: '8px', fontWeight: 700, color: '#2563eb', lineHeight: 1 }}>
-                        {c.event_data?.slice(5, 7) ?? '--'}월
-                      </span>
-                      <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--color-text-primary)', lineHeight: 1 }}>
-                        {c.event_data?.slice(8, 10) ?? '--'}
-                      </span>
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p
+                    해당 날짜의 대회가 없습니다
+                  </p>
+                ) : (
+                  (selectedDate
+                    ? competitions.filter(
+                        (c) =>
+                          c.event_data?.slice(0, 10) === selectedDate ||
+                          c.apply_deadline?.slice(0, 10) === selectedDate,
+                      )
+                    : filteredCompetitions
+                  )
+                    .slice(0, 4)
+                    .map((c) => (
+                      <div
+                        key={c.id}
                         style={{
-                          fontSize: '11.5px', fontWeight: 600, color: 'var(--color-text-primary)',
-                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '7px 0',
+                          borderBottom: '1px solid var(--color-bg-tint)',
                         }}
                       >
-                        {c.name}
-                      </p>
-                      <p style={{ fontSize: '10px', color: 'var(--color-text-tertiary)' }}>{c.location}</p>
-                    </div>
-                  </div>
-                ))}
+                        <div
+                          style={{
+                            width: '34px',
+                            height: '34px',
+                            background: 'rgba(37,99,235,0.12)',
+                            border: '1px solid rgba(37,99,235,0.2)',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: '8px',
+                              fontWeight: 700,
+                              color: '#2563eb',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {c.event_data?.slice(5, 7) ?? '--'}월
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '14px',
+                              fontWeight: 800,
+                              color: 'var(--color-text-primary)',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {c.event_data?.slice(8, 10) ?? '--'}
+                          </span>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p
+                            style={{
+                              fontSize: '11.5px',
+                              fontWeight: 600,
+                              color: 'var(--color-text-primary)',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {c.name}
+                          </p>
+                          <p
+                            style={{
+                              fontSize: '10px',
+                              color: 'var(--color-text-tertiary)',
+                            }}
+                          >
+                            {c.location}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                )}
               </div>
             </div>
           )}

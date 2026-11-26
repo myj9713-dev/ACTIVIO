@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 const NAV_LINKS = [
   { label: '대시보드', href: '/dashboard' },
+  { label: '뉴스', href: '/news' },
   { label: '커뮤니티', href: '/community' },
   { label: '대회일정', href: '/competitions' },
   { label: '도장찾기', href: '/dojangs' },
@@ -58,8 +59,10 @@ export default function Footer() {
                 maxWidth: '220px',
               }}
             >
-              스포츠인과 도장을<br />
-              하나의 공간에서 연결하는<br />
+              스포츠인과 도장을
+              <br />
+              하나의 공간에서 연결하는
+              <br />
               올인원 커뮤니티 플랫폼
             </p>
           </div>
@@ -80,7 +83,16 @@ export default function Footer() {
               >
                 메뉴
               </p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <ul
+                style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
+              >
                 {NAV_LINKS.map(({ label, href }) => (
                   <li key={href}>
                     <Link
@@ -114,10 +126,18 @@ export default function Footer() {
               >
                 플랫폼
               </p>
-              <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.9' }}>
-                Next.js · Supabase<br />
-                Tailwind CSS · TypeScript<br />
-                Naver Maps API
+              <p
+                style={{
+                  fontSize: '12.5px',
+                  color: 'var(--color-text-secondary)',
+                  lineHeight: '1.9',
+                }}
+              >
+                Next.js · Supabase
+                <br />
+                Tailwind CSS · TypeScript
+                <br />
+                Naver Maps API · Naver News API
               </p>
             </div>
           </div>
@@ -134,11 +154,13 @@ export default function Footer() {
             justifyContent: 'space-between',
           }}
         >
-          <p style={{ fontSize: '11.5px', color: 'var(--color-text-tertiary)' }}>
+          <p
+            style={{ fontSize: '11.5px', color: 'var(--color-text-tertiary)' }}
+          >
             © 2025 Activio. All rights reserved.
           </p>
           <p style={{ fontSize: '11.5px', color: 'var(--color-text-hint)' }}>
-            프론트엔드 부트캠프 16기 Team 3
+            프론트엔드 부트캠프 16기 수료 프로젝트 V2
           </p>
         </div>
       </div>

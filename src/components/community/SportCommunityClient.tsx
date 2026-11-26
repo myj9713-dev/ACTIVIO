@@ -17,12 +17,29 @@ import { useCommunityListState } from '@/hooks/useCommunityListState';
 
 interface SportCommunityClientProps {
   initialPosts: Post[];
-  sport: { slug: string; name: string; icon: string; hero: string; heroPos: string; color: string };
+  sport: {
+    slug: string;
+    name: string;
+    icon: string;
+    iconSize?: string | number;
+    hero: string;
+    heroPos: string;
+    color: string;
+  };
 }
 
-export default function SportCommunityClient({ initialPosts, sport }: SportCommunityClientProps) {
-  const { searchQuery, setSearchQuery, debouncedSearch, hoveredSlug, setHoveredSlug, isScrollRestoredRef } =
-    useCommunityListState();
+export default function SportCommunityClient({
+  initialPosts,
+  sport,
+}: SportCommunityClientProps) {
+  const {
+    searchQuery,
+    setSearchQuery,
+    debouncedSearch,
+    hoveredSlug,
+    setHoveredSlug,
+    isScrollRestoredRef,
+  } = useCommunityListState();
   const { user, loading } = useAuth();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
@@ -67,7 +84,9 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
 
   useEffect(() => {
     if (drawerOpen && drawerRef.current) {
-      const first = drawerRef.current.querySelector<HTMLElement>('a[href], button:not([disabled])');
+      const first = drawerRef.current.querySelector<HTMLElement>(
+        'a[href], button:not([disabled])',
+      );
       first?.focus();
     }
   }, [drawerOpen]);
@@ -75,18 +94,29 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!drawerOpen) return;
-      if (e.key === 'Escape') { closeDrawer(); return; }
+      if (e.key === 'Escape') {
+        closeDrawer();
+        return;
+      }
       if (e.key !== 'Tab' || !drawerRef.current) return;
       const focusable = Array.from(
-        drawerRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+        drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled])',
+        ),
       );
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
       } else {
-        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -106,25 +136,67 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
           src={sport.hero}
           alt=""
           aria-hidden="true"
-          style={{ objectFit: 'cover', objectPosition: sport.heroPos, opacity: 0.38, filter: 'grayscale(10%)' }}
+          style={{
+            objectFit: 'cover',
+            objectPosition: sport.heroPos,
+            opacity: 0.38,
+            filter: 'grayscale(10%)',
+          }}
           priority
           sizes="100vw"
         />
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(to top, rgba(var(--color-scrim-rgb),0.96) 0%, rgba(var(--color-scrim-rgb),0.45) 60%, rgba(var(--color-scrim-rgb),0.2) 100%)' }}
+          style={{
+            background:
+              'linear-gradient(to top, rgba(var(--color-scrim-rgb),0.96) 0%, rgba(var(--color-scrim-rgb),0.45) 60%, rgba(var(--color-scrim-rgb),0.2) 100%)',
+          }}
         />
-        <div className="relative z-10 px-6 pb-5 flex items-end gap-3">
-          <span style={{ fontSize: '36px', lineHeight: 1 }}>{sport.icon}</span>
-          <h1 className="font-extrabold text-text-primary text-[38px] leading-none tracking-[-0.04em]">
-            {sport.name}
-          </h1>
+        <div className="relative z-10 px-6 pb-6 md:px-12 md:pb-8">
+          <p
+            style={{
+              fontSize: '10.5px',
+              fontWeight: 600,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '10px',
+            }}
+          >
+            {`COMMUNITY · ${sport.slug.toUpperCase()}`}
+          </p>
+
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shrink-0"
+              style={{
+                background: `${sport.color}33`,
+                border: `1.5px solid ${sport.color}66`,
+                fontSize: sport.iconSize ?? '20px',
+              }}
+            >
+              {sport.icon}
+            </span>
+            <h1 className="font-extrabold text-text-primary text-[38px] md:text-[52px] leading-none tracking-[-0.04em]">
+              {sport.name}
+            </h1>
+          </div>
+
+          <p
+            style={{
+              fontSize: '13px',
+              color: 'var(--color-text-secondary)',
+              marginTop: '10px',
+            }}
+          >
+            {`${sport.name} 수련생들과 훈련, 기술, 대회 소식을 함께 나눠보세요.`}
+          </p>
         </div>
       </div>
 
       {/* ── 3-column layout ── */}
       <div className="max-w-[1200px] mx-auto px-4 py-6 flex gap-5 items-start">
-
         {/* ── Left sidebar: Promo Ad ── */}
         <aside
           className="hidden lg:flex flex-col shrink-0"
@@ -162,7 +234,10 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
               onClick={() => setDrawerOpen(true)}
               aria-expanded={drawerOpen}
               aria-label="사이드바 열기"
-              style={{ background: 'var(--color-bg-tint)', border: '1px solid var(--color-border-medium)' }}
+              style={{
+                background: 'var(--color-bg-tint)',
+                border: '1px solid var(--color-border-medium)',
+              }}
             >
               <Menu size={16} aria-hidden="true" />
             </button>
@@ -176,7 +251,11 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                 padding: '0 16px',
               }}
             >
-              <Search size={14} style={{ opacity: 0.4, flexShrink: 0 }} aria-hidden="true" />
+              <Search
+                size={14}
+                style={{ opacity: 0.4, flexShrink: 0 }}
+                aria-hidden="true"
+              />
               <input
                 type="search"
                 value={searchQuery}
@@ -192,9 +271,17 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
               <Link
                 href={`/community/sport/${sport.slug}/write`}
                 className="shrink-0 h-10 flex items-center rounded-full text-white text-[13px] font-semibold whitespace-nowrap"
-                style={{ background: sport.color, padding: '0 20px', transition: 'opacity 0.15s' }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = '0.85')}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+                style={{
+                  background: sport.color,
+                  padding: '0 20px',
+                  transition: 'opacity 0.15s',
+                }}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLElement).style.opacity = '0.85')
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLElement).style.opacity = '1')
+                }
               >
                 글쓰기
               </Link>
@@ -248,18 +335,32 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
               aria-live="polite"
               style={{ color: 'var(--color-text-disabled)' }}
             >
-              <p style={{ fontSize: '32px', marginBottom: '12px' }}>{sport.icon}</p>
-              <p style={{ fontSize: '15px' }}>{sport.name} 커뮤니티의 첫 글을 작성해보세요</p>
+              <p style={{ fontSize: '32px', marginBottom: '12px' }}>
+                {sport.icon}
+              </p>
+              <p style={{ fontSize: '15px' }}>
+                {sport.name} 커뮤니티의 첫 글을 작성해보세요
+              </p>
             </div>
           )}
 
           {hasNextPage && (
-            <div ref={observerRef} className="h-16 flex items-center justify-center">
-              <div role="status" aria-live="polite" aria-label={isFetchingNextPage ? '더 불러오는 중' : ''}>
+            <div
+              ref={observerRef}
+              className="h-16 flex items-center justify-center"
+            >
+              <div
+                role="status"
+                aria-live="polite"
+                aria-label={isFetchingNextPage ? '더 불러오는 중' : ''}
+              >
                 {isFetchingNextPage && (
                   <div
                     className="w-6 h-6 border-2 rounded-full animate-spin"
-                    style={{ borderColor: sport.color, borderTopColor: 'transparent' }}
+                    style={{
+                      borderColor: sport.color,
+                      borderTopColor: 'transparent',
+                    }}
                     aria-hidden="true"
                   />
                 )}
@@ -304,7 +405,10 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                 alignItems: 'center',
                 gap: '12px',
                 padding: '10px 16px',
-                background: hoveredSlug === '__community' ? 'var(--color-bg-tint)' : 'transparent',
+                background:
+                  hoveredSlug === '__community'
+                    ? 'var(--color-bg-tint)'
+                    : 'transparent',
                 borderLeft: `3px solid ${hoveredSlug === '__community' ? '#2563eb' : 'transparent'}`,
                 textDecoration: 'none',
                 transition: 'background 0.15s',
@@ -314,15 +418,29 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
             >
               <div
                 style={{
-                  width: '34px', height: '34px', borderRadius: '50%',
-                  background: 'rgba(37,99,235,0.15)', border: '1.5px solid rgba(37,99,235,0.3)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '17px', flexShrink: 0,
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '50%',
+                  background: 'rgba(37,99,235,0.15)',
+                  border: '1.5px solid rgba(37,99,235,0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '17px',
+                  flexShrink: 0,
                 }}
               >
                 📢
               </div>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-high)' }}>공지</span>
+              <span
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: 'var(--color-text-high)',
+                }}
+              >
+                공지
+              </span>
             </Link>
 
             {SPORTS.map(({ slug, name, icon, iconSize, color }) => {
@@ -340,16 +458,39 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                   >
                     <div
                       style={{
-                        width: '34px', height: '34px', borderRadius: '50%',
-                        background: color + '33', border: `1.5px solid ${color}88`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: iconSize, flexShrink: 0,
+                        width: '34px',
+                        height: '34px',
+                        borderRadius: '50%',
+                        background: color + '33',
+                        border: `1.5px solid ${color}88`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: iconSize,
+                        flexShrink: 0,
                       }}
                     >
                       {icon}
                     </div>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{name}</span>
-                    <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: color, marginLeft: 'auto', flexShrink: 0 }} />
+                    <span
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        color: 'var(--color-text-primary)',
+                      }}
+                    >
+                      {name}
+                    </span>
+                    <div
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: color,
+                        marginLeft: 'auto',
+                        flexShrink: 0,
+                      }}
+                    />
                   </div>
                 );
               }
@@ -362,7 +503,10 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                     alignItems: 'center',
                     gap: '12px',
                     padding: '10px 16px',
-                    background: hoveredSlug === slug ? 'var(--color-bg-tint)' : 'transparent',
+                    background:
+                      hoveredSlug === slug
+                        ? 'var(--color-bg-tint)'
+                        : 'transparent',
                     borderLeft: `3px solid ${hoveredSlug === slug ? color : 'transparent'}`,
                     textDecoration: 'none',
                     transition: 'background 0.15s',
@@ -372,15 +516,29 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                 >
                   <div
                     style={{
-                      width: '34px', height: '34px', borderRadius: '50%',
-                      background: color + '33', border: `1.5px solid ${color}66`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '17px', flexShrink: 0,
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      background: color + '33',
+                      border: `1.5px solid ${color}66`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '17px',
+                      flexShrink: 0,
                     }}
                   >
                     {icon}
                   </div>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-high)' }}>{name}</span>
+                  <span
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'var(--color-text-high)',
+                    }}
+                  >
+                    {name}
+                  </span>
                 </Link>
               );
             })}
@@ -426,13 +584,27 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                 background: 'var(--color-bg-surface)',
               }}
             >
-              <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+              <span
+                style={{
+                  fontSize: '13.5px',
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
                 커뮤니티 메뉴
               </span>
               <button
                 onClick={closeDrawer}
                 aria-label="메뉴 닫기"
-                style={{ padding: '6px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center' }}
+                style={{
+                  padding: '6px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-tertiary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
               >
                 <X size={18} aria-hidden="true" />
               </button>
@@ -459,9 +631,13 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                   href="/community"
                   onClick={closeDrawer}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '12px',
-                    padding: '10px 16px', textDecoration: 'none',
-                    transition: 'background 0.15s', borderLeft: '3px solid transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '10px 16px',
+                    textDecoration: 'none',
+                    transition: 'background 0.15s',
+                    borderLeft: '3px solid transparent',
                   }}
                   onMouseEnter={(e) => {
                     const el = e.currentTarget as HTMLElement;
@@ -476,15 +652,29 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                 >
                   <div
                     style={{
-                      width: '34px', height: '34px', borderRadius: '50%',
-                      background: 'rgba(37,99,235,0.15)', border: '1.5px solid rgba(37,99,235,0.3)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '17px', flexShrink: 0,
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      background: 'rgba(37,99,235,0.15)',
+                      border: '1.5px solid rgba(37,99,235,0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '17px',
+                      flexShrink: 0,
                     }}
                   >
                     📢
                   </div>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-high)' }}>공지</span>
+                  <span
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'var(--color-text-high)',
+                    }}
+                  >
+                    공지
+                  </span>
                 </Link>
                 {SPORTS.map(({ slug, name, icon, iconSize, color }) => {
                   const isActive = slug === sport.slug;
@@ -493,20 +683,47 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                       <div
                         key={slug}
                         className="flex items-center gap-3"
-                        style={{ padding: '10px 16px', background: 'var(--color-btn-basic)', borderLeft: `3px solid ${color}` }}
+                        style={{
+                          padding: '10px 16px',
+                          background: 'var(--color-btn-basic)',
+                          borderLeft: `3px solid ${color}`,
+                        }}
                       >
                         <div
                           style={{
-                            width: '34px', height: '34px', borderRadius: '50%',
-                            background: color + '33', border: `1.5px solid ${color}88`,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '17px', flexShrink: 0,
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '50%',
+                            background: color + '33',
+                            border: `1.5px solid ${color}88`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '17px',
+                            flexShrink: 0,
                           }}
                         >
                           {icon}
                         </div>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{name}</span>
-                        <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: color, marginLeft: 'auto', flexShrink: 0 }} />
+                        <span
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            color: 'var(--color-text-primary)',
+                          }}
+                        >
+                          {name}
+                        </span>
+                        <div
+                          style={{
+                            width: '7px',
+                            height: '7px',
+                            borderRadius: '50%',
+                            background: color,
+                            marginLeft: 'auto',
+                            flexShrink: 0,
+                          }}
+                        />
                       </div>
                     );
                   }
@@ -516,9 +733,13 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                       href={`/community/sport/${slug}`}
                       onClick={closeDrawer}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: '12px',
-                        padding: '10px 16px', textDecoration: 'none',
-                        transition: 'background 0.15s', borderLeft: '3px solid transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '10px 16px',
+                        textDecoration: 'none',
+                        transition: 'background 0.15s',
+                        borderLeft: '3px solid transparent',
                       }}
                       onMouseEnter={(e) => {
                         const el = e.currentTarget as HTMLElement;
@@ -533,21 +754,34 @@ export default function SportCommunityClient({ initialPosts, sport }: SportCommu
                     >
                       <div
                         style={{
-                          width: '34px', height: '34px', borderRadius: '50%',
-                          background: color + '33', border: `1.5px solid ${color}66`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '17px', flexShrink: 0,
+                          width: '34px',
+                          height: '34px',
+                          borderRadius: '50%',
+                          background: color + '33',
+                          border: `1.5px solid ${color}66`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '17px',
+                          flexShrink: 0,
                         }}
                       >
                         {icon}
                       </div>
-                      <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-high)' }}>{name}</span>
+                      <span
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          color: 'var(--color-text-high)',
+                        }}
+                      >
+                        {name}
+                      </span>
                     </Link>
                   );
                 })}
               </div>
             </div>
-
           </div>
 
           {/* Backdrop */}
