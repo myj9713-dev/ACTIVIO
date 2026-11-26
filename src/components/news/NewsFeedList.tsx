@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Search } from 'lucide-react';
+import { Menu, Search, X } from 'lucide-react';
 import PromoAdSidebar from '@/components/community/PromoAdSidebar';
 import PromoAdBannerMobile from '@/components/community/PromoAdBannerMobile';
 import { SPORTS } from '@/constants/sports';
@@ -35,6 +35,61 @@ export function NewsFeedList({ items, isError = false }: NewsFeedListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredCategory, setHoveredCategory] =
     useState<SportNewsCategory | null>(null);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  const closeDrawer = useCallback(() => {
+    setDrawerOpen(false);
+    triggerRef.current?.focus();
+  }, []);
+
+  const handleSelectCategory = useCallback((category: FilterCategory) => {
+    setSelectedCategory(category);
+    setDrawerOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (drawerOpen && drawerRef.current) {
+      const first = drawerRef.current.querySelector<HTMLElement>(
+        'a[href], button:not([disabled])',
+      );
+      first?.focus();
+    }
+  }, [drawerOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!drawerOpen) return;
+      if (e.key === 'Escape') {
+        closeDrawer();
+        return;
+      }
+      if (e.key !== 'Tab' || !drawerRef.current) return;
+      const focusable = Array.from(
+        drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled])',
+        ),
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [drawerOpen, closeDrawer]);
 
   const sportsWithCategory = useMemo(() => {
     return SPORTS_NEWS_CATEGORIES.map((category) => {
@@ -168,6 +223,23 @@ export function NewsFeedList({ items, isError = false }: NewsFeedListProps) {
               marginTop: '-10px',
             }}
           >
+            {/* Mobile sidebar trigger */}
+            <button
+              ref={triggerRef}
+              type="button"
+              className="lg:hidden shrink-0 w-10 h-10 flex items-center justify-center rounded-full cursor-pointer"
+              onClick={() => setDrawerOpen(true)}
+              aria-expanded={drawerOpen}
+              aria-label="종목 필터 메뉴 열기"
+              style={{
+                background: 'var(--color-bg-tint)',
+                border: '1px solid var(--color-border-medium)',
+                color: 'var(--color-text-primary)',
+              }}
+            >
+              <Menu size={16} aria-hidden="true" />
+            </button>
+
             <div
               className="flex items-center gap-2 flex-1 h-10"
               style={{
@@ -352,10 +424,9 @@ export function NewsFeedList({ items, isError = false }: NewsFeedListProps) {
           </div>
 
           <div style={{ padding: '6px 0' }}>
-            {/* 전체 (기존 '공지' 자리) */}
             <button
               type="button"
-              onClick={() => setSelectedCategory('전체')}
+              onClick={() => handleSelectCategory('전체')}
               className="w-full flex items-center gap-3 cursor-pointer text-left"
               style={{
                 padding: '10px 16px',
@@ -419,7 +490,7 @@ export function NewsFeedList({ items, isError = false }: NewsFeedListProps) {
                   key={category}
                   type="button"
                   onClick={() =>
-                    setSelectedCategory(isSelected ? '전체' : category)
+                    handleSelectCategory(isSelected ? '전체' : category)
                   }
                   onMouseEnter={() => setHoveredCategory(category)}
                   onMouseLeave={() => setHoveredCategory(null)}
@@ -484,6 +555,231 @@ export function NewsFeedList({ items, isError = false }: NewsFeedListProps) {
       </div>
 
       <div style={{ paddingBottom: '64px' }} />
+
+      {/* ── Mobile drawer (lg 미만에서만 렌더) ── */}
+      {drawerOpen && (
+        <div
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="종목 필터 메뉴"
+          className="lg:hidden fixed inset-0 z-50 flex"
+        >
+          <div
+            style={{
+              width: '300px',
+              height: '100%',
+              overflowY: 'auto',
+              background: 'var(--color-bg-surface)',
+              borderRight: '1px solid var(--color-border-medium)',
+              display: 'flex',
+              flexDirection: 'column',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                padding: '14px 16px',
+                borderBottom: '1px solid var(--color-border-medium)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                position: 'sticky',
+                top: 0,
+                zIndex: 1,
+                background: 'var(--color-bg-surface)',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '13.5px',
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                뉴스 메뉴
+              </span>
+              <button
+                type="button"
+                onClick={closeDrawer}
+                aria-label="메뉴 닫기"
+                style={{
+                  padding: '6px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-tertiary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div>
+              <div
+                style={{
+                  padding: '12px 16px',
+                  borderBottom: '1px solid var(--color-border)',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  color: 'var(--color-text-secondary)',
+                  textTransform: 'uppercase',
+                }}
+              >
+                종목 필터
+              </div>
+
+              <div style={{ padding: '6px 0' }}>
+                <button
+                  type="button"
+                  onClick={() => handleSelectCategory('전체')}
+                  className="w-full flex items-center gap-3 cursor-pointer text-left"
+                  style={{
+                    padding: '10px 16px',
+                    background:
+                      selectedCategory === '전체'
+                        ? 'var(--color-btn-basic)'
+                        : 'transparent',
+                    border: 'none',
+                    borderLeft:
+                      selectedCategory === '전체'
+                        ? '3px solid #2563eb'
+                        : '3px solid transparent',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      background: 'rgba(37,99,235,0.15)',
+                      border: '1.5px solid rgba(37,99,235,0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '16px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    📰
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: 'var(--color-text-primary)',
+                    }}
+                  >
+                    전체
+                  </span>
+                  {selectedCategory === '전체' && (
+                    <div
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#2563eb',
+                        marginLeft: 'auto',
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
+                </button>
+
+                {sportsWithCategory.map(
+                  ({ category, icon, iconSize, color }) => {
+                    const isSelected = selectedCategory === category;
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() =>
+                          handleSelectCategory(isSelected ? '전체' : category)
+                        }
+                        className="w-full flex items-center gap-3 cursor-pointer text-left"
+                        style={{
+                          padding: '10px 16px',
+                          background: isSelected
+                            ? 'var(--color-btn-basic)'
+                            : 'transparent',
+                          border: 'none',
+                          borderLeft: isSelected
+                            ? '3px solid #2563eb'
+                            : '3px solid transparent',
+                          fontFamily: 'inherit',
+                          transition: 'background 0.15s',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) {
+                            const el = e.currentTarget as HTMLElement;
+                            el.style.background = 'var(--color-bg-tint)';
+                            el.style.borderLeftColor = color;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) {
+                            const el = e.currentTarget as HTMLElement;
+                            el.style.background = 'transparent';
+                            el.style.borderLeftColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '50%',
+                            background: color + '33',
+                            border: `1.5px solid ${color}66`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: iconSize,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {icon}
+                        </div>
+                        <span
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: isSelected ? 700 : 600,
+                            color: 'var(--color-text-high)',
+                          }}
+                        >
+                          {category}
+                        </span>
+                        {isSelected && (
+                          <div
+                            style={{
+                              width: '7px',
+                              height: '7px',
+                              borderRadius: '50%',
+                              background: '#2563eb',
+                              marginLeft: 'auto',
+                              flexShrink: 0,
+                            }}
+                          />
+                        )}
+                      </button>
+                    );
+                  },
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{ flex: 1, background: 'rgba(0,0,0,0.5)' }}
+            onClick={closeDrawer}
+            aria-hidden="true"
+          />
+        </div>
+      )}
     </section>
   );
 }
