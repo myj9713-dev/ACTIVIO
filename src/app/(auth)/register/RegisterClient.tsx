@@ -11,7 +11,7 @@ export default function RegisterClient() {
 
   return (
     <>
-      <div role="tablist" className="flex border-b border-white/[0.08] mb-6">
+      <div role="tablist" className="flex border-b border-border mb-6">
         <button
           type="button"
           role="tab"
