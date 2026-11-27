@@ -4,12 +4,15 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import BfcacheRefresher from '@/components/common/BfcacheRefresher';
+import ThemeToggle from '@/components/common/ThemeToggle';
 import HomeLoggedInButtons from '@/components/home/HomeLoggedInButtons';
 import { BG_IMAGES } from '@/constants/bgImages';
 
 async function AuthButtons() {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (user) {
     return <HomeLoggedInButtons />;
@@ -50,6 +53,11 @@ export default function Home() {
     >
       <BfcacheRefresher />
 
+      {/* 우측 상단 테마 전환 버튼 */}
+      <div className="fixed top-5 right-5 z-20">
+        <ThemeToggle className="bg-black/30 backdrop-blur-md border border-white/10 light:bg-white/80 light:border-black/10" />
+      </div>
+
       {/* Slideshow backgrounds */}
       {BG_IMAGES.map(({ src, cls }, idx) => (
         <Image
@@ -71,7 +79,8 @@ export default function Home() {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(to bottom, rgba(var(--color-scrim-rgb),0.82) 0%, rgba(var(--color-scrim-rgb),0.72) 40%, rgba(var(--color-scrim-rgb),0.92) 100%)',
+          background:
+            'linear-gradient(to bottom, rgba(var(--color-scrim-rgb),0.82) 0%, rgba(var(--color-scrim-rgb),0.72) 40%, rgba(var(--color-scrim-rgb),0.92) 100%)',
           pointerEvents: 'none',
           zIndex: 1,
         }}
@@ -106,7 +115,8 @@ export default function Home() {
           <em
             style={{
               fontStyle: 'normal',
-              background: 'linear-gradient(135deg, var(--color-brand-grad-end), var(--color-brand-grad-mid))',
+              background:
+                'linear-gradient(135deg, var(--color-brand-grad-end), var(--color-brand-grad-mid))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               letterSpacing: '0.08em',
