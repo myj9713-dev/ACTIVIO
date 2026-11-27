@@ -62,18 +62,20 @@
   --color-text-tertiary: var(--color-text-tertiary);
   --color-text-hint: var(--color-text-hint);
   --color-text-disabled: var(--color-text-disabled);
-  --color-input-text: var(--color-text-primary);     /* alias: input 텍스트 = primary */
+  --color-input-text: var(
+    --color-text-primary
+  ); /* alias: input 텍스트 = primary */
   --color-btn-text: var(--color-btn-text);
 
   /* ── 배경 ── */
   --color-bg-page: var(--color-bg-page);
   --color-bg-surface: var(--color-bg-surface);
-  --color-bg-white: var(--color-bg-surface);          /* backward-compat alias */
+  --color-bg-white: var(--color-bg-surface); /* backward-compat alias */
   --color-bg-surface-alt: var(--color-bg-surface-alt);
   --color-bg-footer: var(--color-bg-footer);
   --color-bg-tint: var(--color-bg-tint);
   --color-surface-2: var(--color-surface-2);
-  --color-table-top: var(--color-surface-2);          /* alias */
+  --color-table-top: var(--color-surface-2); /* alias */
 
   /* ── 보더·구분선 ── */
   --color-border: var(--color-border);
@@ -82,8 +84,8 @@
 
   /* ── 버튼·인풋 ── */
   --color-btn-basic: var(--color-btn-basic);
-  --color-input-bg: var(--color-bg-tint);             /* alias: input bg = tint */
-  --color-state-basic-bg: var(--color-bg-tint);       /* alias */
+  --color-input-bg: var(--color-bg-tint); /* alias: input bg = tint */
+  --color-state-basic-bg: var(--color-bg-tint); /* alias */
 
   /* ── 오버레이·효과 ── */
   --color-overlay: var(--color-overlay);
@@ -112,6 +114,8 @@
    :root — 다크 모드 기본값 (defaultTheme="dark")
    ───────────────────────────────────────────────────────────────── */
 :root {
+  color-scheme: dark;
+
   /* shadcn */
   --background: oklch(0.09 0 0);
   --foreground: oklch(0.949 0 0);
@@ -150,9 +154,9 @@
   --color-text-primary: #ffffff;
   --color-text-high: rgba(255, 255, 255, 0.85);
   --color-text-secondary: rgba(255, 255, 255, 0.65);
-  --color-text-tertiary: rgba(255, 255, 255, 0.50);
+  --color-text-tertiary: rgba(255, 255, 255, 0.5);
   --color-text-hint: rgba(255, 255, 255, 0.35);
-  --color-text-disabled: rgba(255, 255, 255, 0.20);
+  --color-text-disabled: rgba(255, 255, 255, 0.2);
   --color-btn-text: #9ca3af;
 
   --color-bg-page: #111111;
@@ -168,7 +172,7 @@
 
   --color-btn-basic: rgba(255, 255, 255, 0.07);
 
-  --color-overlay: rgba(0, 0, 0, 0.60);
+  --color-overlay: rgba(0, 0, 0, 0.6);
   --color-highlight-shadow: rgba(255, 255, 255, 0.05);
 
   /* 그라디언트 스크림 — RGB 채널만 정의해서 rgba(var(--color-scrim-rgb), opacity) 로 사용 */
@@ -190,6 +194,8 @@
    .dark — 명시적 다크 모드 (setTheme('dark') 시 html.class="dark")
    ───────────────────────────────────────────────────────────────── */
 .dark {
+  color-scheme: dark;
+
   /* shadcn */
   --background: oklch(0.09 0 0);
   --foreground: oklch(0.949 0 0);
@@ -227,9 +233,9 @@
   --color-text-primary: #ffffff;
   --color-text-high: rgba(255, 255, 255, 0.85);
   --color-text-secondary: rgba(255, 255, 255, 0.65);
-  --color-text-tertiary: rgba(255, 255, 255, 0.50);
+  --color-text-tertiary: rgba(255, 255, 255, 0.5);
   --color-text-hint: rgba(255, 255, 255, 0.35);
-  --color-text-disabled: rgba(255, 255, 255, 0.20);
+  --color-text-disabled: rgba(255, 255, 255, 0.2);
   --color-btn-text: #9ca3af;
 
   --color-bg-page: #111111;
@@ -245,7 +251,7 @@
 
   --color-btn-basic: rgba(255, 255, 255, 0.07);
 
-  --color-overlay: rgba(0, 0, 0, 0.60);
+  --color-overlay: rgba(0, 0, 0, 0.6);
   --color-highlight-shadow: rgba(255, 255, 255, 0.05);
 
   --color-scrim-rgb: 17, 17, 17;
@@ -263,6 +269,8 @@
    .light — 라이트 모드 (setTheme('light') 시 html.class="light")
    ───────────────────────────────────────────────────────────────── */
 .light {
+  color-scheme: light;
+
   /* shadcn */
   --background: oklch(0.98 0 0);
   --foreground: oklch(0.09 0 0);
@@ -292,7 +300,7 @@
   --color-text-secondary: rgba(0, 0, 0, 0.65);
   --color-text-tertiary: rgba(0, 0, 0, 0.55);
   --color-text-hint: rgba(0, 0, 0, 0.45);
-  --color-text-disabled: rgba(0, 0, 0, 0.30);
+  --color-text-disabled: rgba(0, 0, 0, 0.3);
   --color-btn-text: #6b7280;
 
   --color-bg-page: #eaecf1;
@@ -346,41 +354,105 @@
 
 /* ── Home slideshow (6 images, 5s each = 30s total) ── */
 @keyframes bgSlide1 {
-  0%,13.33%   { opacity: 1; }
-  16.66%,83.33% { opacity: 0; }
-  100%         { opacity: 1; }
+  0%,
+  13.33% {
+    opacity: 1;
+  }
+  16.66%,
+  83.33% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 @keyframes bgSlide2 {
-  0%,13.33%    { opacity: 0; }
-  16.66%,30%   { opacity: 1; }
-  33.33%,100%  { opacity: 0; }
+  0%,
+  13.33% {
+    opacity: 0;
+  }
+  16.66%,
+  30% {
+    opacity: 1;
+  }
+  33.33%,
+  100% {
+    opacity: 0;
+  }
 }
 @keyframes bgSlide3 {
-  0%,30%       { opacity: 0; }
-  33.33%,46.66% { opacity: 1; }
-  50%,100%     { opacity: 0; }
+  0%,
+  30% {
+    opacity: 0;
+  }
+  33.33%,
+  46.66% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 @keyframes bgSlide4 {
-  0%,46.66%    { opacity: 0; }
-  50%,63.33%   { opacity: 1; }
-  66.66%,100%  { opacity: 0; }
+  0%,
+  46.66% {
+    opacity: 0;
+  }
+  50%,
+  63.33% {
+    opacity: 1;
+  }
+  66.66%,
+  100% {
+    opacity: 0;
+  }
 }
 @keyframes bgSlide5 {
-  0%,63.33%    { opacity: 0; }
-  66.66%,80%   { opacity: 1; }
-  83.33%,100%  { opacity: 0; }
+  0%,
+  63.33% {
+    opacity: 0;
+  }
+  66.66%,
+  80% {
+    opacity: 1;
+  }
+  83.33%,
+  100% {
+    opacity: 0;
+  }
 }
 @keyframes bgSlide6 {
-  0%,80%       { opacity: 0; }
-  83.33%,96.66% { opacity: 1; }
-  100%         { opacity: 0; }
+  0%,
+  80% {
+    opacity: 0;
+  }
+  83.33%,
+  96.66% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
-.home-bg-1 { animation: bgSlide1 30s ease-in-out infinite; }
-.home-bg-2 { animation: bgSlide2 30s ease-in-out infinite; }
-.home-bg-3 { animation: bgSlide3 30s ease-in-out infinite; }
-.home-bg-4 { animation: bgSlide4 30s ease-in-out infinite; }
-.home-bg-5 { animation: bgSlide5 30s ease-in-out infinite; }
-.home-bg-6 { animation: bgSlide6 30s ease-in-out infinite; }
+.home-bg-1 {
+  animation: bgSlide1 30s ease-in-out infinite;
+}
+.home-bg-2 {
+  animation: bgSlide2 30s ease-in-out infinite;
+}
+.home-bg-3 {
+  animation: bgSlide3 30s ease-in-out infinite;
+}
+.home-bg-4 {
+  animation: bgSlide4 30s ease-in-out infinite;
+}
+.home-bg-5 {
+  animation: bgSlide5 30s ease-in-out infinite;
+}
+.home-bg-6 {
+  animation: bgSlide6 30s ease-in-out infinite;
+}
 
 /* ── 스크롤바 숨김 ── */
 .no-scrollbar {
