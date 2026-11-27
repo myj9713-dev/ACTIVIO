@@ -11,35 +11,37 @@ import {
   Users,
   HelpCircle,
   LogOut,
-  Sun,
-  Moon,
   UserCircle,
   ExternalLink,
 } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import ThemeToggle from '@/components/common/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 
 const ADMIN_NAV_ITEMS = [
   { label: '대시보드', href: '/admin', icon: LayoutDashboard, exact: true },
   { label: '게시글', href: '/admin/posts', icon: FileText, exact: false },
-  { label: '대회일정', href: '/admin/competitions', icon: Calendar, exact: false },
+  {
+    label: '대회일정',
+    href: '/admin/competitions',
+    icon: Calendar,
+    exact: false,
+  },
   { label: '유저', href: '/admin/users', icon: Users, exact: false },
   { label: '고객지원', href: '/admin/support', icon: HelpCircle, exact: false },
 ];
 
 export default function AdminTopNav() {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
   const { user, loading, logout } = useAuth();
-  const [mounted, setMounted] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setMounted(true); }, []);
-
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     }
@@ -123,18 +125,7 @@ export default function AdminTopNav() {
         </Link>
 
         {/* 테마 토글 */}
-        {mounted && (
-          <button
-            type="button"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-            className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors
-                       text-white/60 hover:text-white hover:bg-white/[0.06]
-                       light:text-[#6b7280] light:hover:text-[#0f1117] light:hover:bg-black/[0.06]"
-          >
-            {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
-        )}
+        <ThemeToggle className="text-white/60 hover:bg-white/[0.06]" />
 
         {/* 유저 영역 — TopNav와 동일한 드롭다운 */}
         {loading ? (

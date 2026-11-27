@@ -4,16 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import {
-  LogOut,
-  UserCircle,
-  Menu,
-  X,
-  Sun,
-  Moon,
-  LayoutDashboard,
-} from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { LogOut, UserCircle, Menu, X, LayoutDashboard } from 'lucide-react';
+import ThemeToggle from '@/components/common/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { isAdminRole } from '@/lib/role';
 
@@ -26,15 +18,9 @@ const NAV_ITEMS = [
 export default function TopNav() {
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();
-  const { theme, setTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -147,20 +133,7 @@ export default function TopNav() {
 
         {/* 우측 유저 영역 */}
         <div className="flex items-center gap-2 shrink-0">
-          {mounted && (
-            <button
-              type="button"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label={
-                theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'
-              }
-              className="w-9 h-9 flex items-center justify-center rounded-lg
-                       text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors
-                       light:text-[#6b7280] light:hover:text-[#0f1117] light:hover:bg-black/[0.06]"
-            >
-              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
-          )}
+          <ThemeToggle className="text-white/60 hover:bg-white/[0.06]" />
           {loading ? (
             <div
               className="w-9 h-9 rounded-full bg-white/10 light:bg-black/[0.1] animate-pulse"
